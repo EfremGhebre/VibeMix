@@ -2,18 +2,30 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import MoodCard, { type Mood } from './MoodCard';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { 
+  Smile, 
+  Snowflake, 
+  Target, 
+  Cloud, 
+  Zap, 
+  Heart, 
+  Crown, 
+  Leaf, 
+  Music, 
+  CloudRain 
+} from 'lucide-react';
 
 const moods: Mood[] = [
-  { slug: 'happy', emoji: '😊', labelKey: 'mood.happy' },
-  { slug: 'chill', emoji: '🧊', labelKey: 'mood.chill' },
-  { slug: 'focus', emoji: '🎯', labelKey: 'mood.focus' },
-  { slug: 'sad', emoji: '🌧️', labelKey: 'mood.sad' },
-  { slug: 'energetic', emoji: '⚡', labelKey: 'mood.energetic' },
-  { slug: 'romantic', emoji: '💞', labelKey: 'mood.romantic' },
-  { slug: 'confident', emoji: '🦁', labelKey: 'mood.confident' },
-  { slug: 'mellow', emoji: '🍃', labelKey: 'mood.mellow' },
-  { slug: 'party', emoji: '🎉', labelKey: 'mood.party' },
-  { slug: 'rainy', emoji: '☔', labelKey: 'mood.rainy' },
+  { slug: 'happy', icon: Smile, labelKey: 'mood.happy' },
+  { slug: 'chill', icon: Snowflake, labelKey: 'mood.chill' },
+  { slug: 'focus', icon: Target, labelKey: 'mood.focus' },
+  { slug: 'sad', icon: Cloud, labelKey: 'mood.sad' },
+  { slug: 'energetic', icon: Zap, labelKey: 'mood.energetic' },
+  { slug: 'romantic', icon: Heart, labelKey: 'mood.romantic' },
+  { slug: 'confident', icon: Crown, labelKey: 'mood.confident' },
+  { slug: 'mellow', icon: Leaf, labelKey: 'mood.mellow' },
+  { slug: 'party', icon: Music, labelKey: 'mood.party' },
+  { slug: 'rainy', icon: CloudRain, labelKey: 'mood.rainy' },
 ];
 
 interface MoodGridProps {

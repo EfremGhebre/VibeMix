@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Music, Headphones, Sparkles, ArrowRight } from 'lucide-react';
+import { Radio, Headphones, Stars, ArrowRight, Target, Palette, Globe, Smile, Snowflake, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import MoodCard from '@/components/mood/MoodCard';
 
 const featuredMoods = [
-  { slug: 'happy', emoji: '😊', labelKey: 'mood.happy' },
-  { slug: 'chill', emoji: '🧊', labelKey: 'mood.chill' },
-  { slug: 'energetic', emoji: '⚡', labelKey: 'mood.energetic' },
+  { slug: 'happy', icon: Smile, labelKey: 'mood.happy' },
+  { slug: 'chill', icon: Snowflake, labelKey: 'mood.chill' },
+  { slug: 'energetic', icon: Zap, labelKey: 'mood.energetic' },
 ];
 
 const Index = () => {
@@ -30,8 +30,8 @@ const Index = () => {
           >
             <div className="flex justify-center mb-6">
               <div className="relative">
-                <Music className="h-16 w-16 text-primary animate-pulse-glow" />
-                <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-accent animate-bounce" />
+                <Radio className="h-16 w-16 text-primary animate-pulse-glow" />
+                <Stars className="absolute -top-2 -right-2 h-6 w-6 text-accent animate-bounce" />
               </div>
             </div>
             
@@ -97,7 +97,7 @@ const Index = () => {
         >
           <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40 hover:border-primary/30 transition-colors">
             <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Music className="h-6 w-6 text-primary" />
+              <Target className="h-6 w-6 text-primary" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Mood-Based</h3>
             <p className="text-muted-foreground">Select your current mood and let our algorithm find the perfect tracks that match your energy.</p>
@@ -105,7 +105,7 @@ const Index = () => {
 
           <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40 hover:border-secondary/30 transition-colors">
             <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-secondary/10 flex items-center justify-center">
-              <Sparkles className="h-6 w-6 text-secondary" />
+              <Palette className="h-6 w-6 text-secondary" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Multi-Genre</h3>
             <p className="text-muted-foreground">Mix and match from multiple genres to create unique playlists that reflect your diverse taste.</p>
@@ -113,7 +113,7 @@ const Index = () => {
 
           <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40 hover:border-accent/30 transition-colors">
             <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-accent/10 flex items-center justify-center">
-              <Headphones className="h-6 w-6 text-accent" />
+              <Globe className="h-6 w-6 text-accent" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Multi-Language</h3>
             <p className="text-muted-foreground">Discover music in multiple languages and expand your musical horizons across cultures.</p>

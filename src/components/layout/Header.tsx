@@ -1,4 +1,4 @@
-import { Moon, Sun, Globe, Music } from 'lucide-react';
+import { Moon, Sun, Globe, Radio, LogIn, UserPlus } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { 
@@ -23,7 +23,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Music className="h-8 w-8 text-primary animate-pulse-glow" />
+          <Radio className="h-8 w-8 text-primary animate-pulse-glow" />
           <h1 className="text-xl font-bold gradient-text">{t('app.name')}</h1>
         </div>
 
@@ -39,7 +39,19 @@ export default function Header() {
           </a>
         </nav>
 
-        <div className={`flex items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
+        <div className={`flex items-center space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
+          {/* Auth Buttons */}
+          <div className={`hidden md:flex items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
+            <Button variant="ghost" size="sm" className="text-sm">
+              <LogIn className="mr-2 h-4 w-4" />
+              {t('auth.login')}
+            </Button>
+            <Button variant="default" size="sm" className="text-sm">
+              <UserPlus className="mr-2 h-4 w-4" />
+              {t('auth.signup')}
+            </Button>
+          </div>
+
           {/* Language Selector */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

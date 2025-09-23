@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { LucideIcon } from 'lucide-react';
 
 export interface Mood {
   slug: string;
-  emoji: string;
+  icon: LucideIcon;
   labelKey: string;
 }
 
@@ -28,8 +29,8 @@ export default function MoodCard({ mood, isSelected, onClick, index }: MoodCardP
       className={`mood-card ${isSelected ? 'mood-card-selected' : ''}`}
     >
       <div className="flex flex-col items-center space-y-3">
-        <div className="text-4xl animate-float" style={{ animationDelay: `${index * 0.2}s` }}>
-          {mood.emoji}
+        <div className="animate-float" style={{ animationDelay: `${index * 0.2}s` }}>
+          <mood.icon className="h-12 w-12 text-primary" />
         </div>
         <h3 className="text-lg font-semibold text-center">
           {t(mood.labelKey)}

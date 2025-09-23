@@ -55,7 +55,7 @@ export default function Header() {
           {/* Language Selector */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-9 w-9">
+              <Button variant="ghost" size="sm" className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0">
                 <Globe className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

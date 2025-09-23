@@ -1,96 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* VibeMix Design System - Modern Minimal Music App */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    /* VibeMix Light Theme */
+    --background: 0 0% 97%;
+    --foreground: 220 10% 8%;
+    
+    --surface: 0 0% 100%;
+    --surface-elevated: 0 0% 98%;
+    
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 220 10% 8%;
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --popover-foreground: 220 10% 8%;
+    
+    /* VibeMix Primary Accents */
+    --primary: 267 83% 58%; /* Purple #7C3AED */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 267 83% 68%;
+    
+    --secondary: 189 95% 44%; /* Cyan #06B6D4 */
+    --secondary-foreground: 0 0% 100%;
+    --secondary-glow: 189 95% 54%;
+    
+    --accent: 142 69% 58%; /* Green #22C55E */
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: 142 69% 68%;
+    
+    /* Supporting Colors */
+    --muted: 220 13% 91%;
+    --muted-foreground: 220 9% 46%;
+    
+    --border: 220 13% 88%;
+    --input: 220 13% 91%;
+    --ring: 267 83% 58%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* VibeMix Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(267 83% 58%), hsl(267 83% 68%));
+    --gradient-secondary: linear-gradient(135deg, hsl(189 95% 44%), hsl(189 95% 54%));
+    --gradient-accent: linear-gradient(135deg, hsl(142 69% 58%), hsl(142 69% 68%));
+    --gradient-hero: linear-gradient(135deg, hsl(267 83% 58%), hsl(189 95% 44%), hsl(142 69% 58%));
+    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
+    
+    /* VibeMix Shadows */
+    --shadow-mood: 0 8px 32px -8px hsl(267 83% 58% / 0.2);
+    --shadow-genre: 0 4px 16px -4px hsl(189 95% 44% / 0.15);
+    --shadow-elevated: 0 10px 40px -10px hsl(220 10% 8% / 0.1);
+    --shadow-glow: 0 0 40px hsl(267 83% 58% / 0.3);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    --radius: 1rem; /* rounded-2xl */
   }
-
+  
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* VibeMix Dark Theme */
+    --background: 220 20% 5%; /* #0B0F14 */
+    --foreground: 0 0% 98%;
+    
+    --surface: 220 18% 8%;
+    --surface-elevated: 220 16% 12%;
+    
+    --card: 220 18% 8%;
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 220 18% 8%;
+    --popover-foreground: 0 0% 98%;
+    
+    /* Primary accents remain vibrant in dark mode */
+    --primary: 267 83% 63%; /* Slightly brighter purple */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 267 83% 73%;
+    
+    --secondary: 189 95% 49%; /* Slightly brighter cyan */
+    --secondary-foreground: 0 0% 100%;
+    --secondary-glow: 189 95% 59%;
+    
+    --accent: 142 69% 63%; /* Slightly brighter green */
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: 142 69% 73%;
+    
+    /* Supporting colors for dark mode */
+    --muted: 220 15% 15%;
+    --muted-foreground: 220 8% 65%;
+    
+    --border: 220 15% 18%;
+    --input: 220 15% 15%;
+    --ring: 267 83% 63%;
+    
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Dark mode gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(267 83% 63%), hsl(267 83% 73%));
+    --gradient-secondary: linear-gradient(135deg, hsl(189 95% 49%), hsl(189 95% 59%));
+    --gradient-accent: linear-gradient(135deg, hsl(142 69% 63%), hsl(142 69% 73%));
+    --gradient-hero: linear-gradient(135deg, hsl(267 83% 63%), hsl(189 95% 49%), hsl(142 69% 63%));
+    --gradient-surface: linear-gradient(180deg, hsl(220 18% 8%), hsl(220 16% 12%));
+    
+    /* Enhanced shadows for dark mode */
+    --shadow-mood: 0 12px 40px -8px hsl(267 83% 63% / 0.4);
+    --shadow-genre: 0 6px 20px -4px hsl(189 95% 49% / 0.25);
+    --shadow-elevated: 0 16px 48px -12px hsl(220 20% 0% / 0.4);
+    --shadow-glow: 0 0 60px hsl(267 83% 63% / 0.5);
   }
 }
 
@@ -98,8 +122,100 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-
+  
+  html {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: 'cv11', 'ss01';
+    font-variation-settings: 'opsz' 32;
   }
+  
+  /* RTL Support */
+  [dir="rtl"] {
+    direction: rtl;
+  }
+  
+  [dir="rtl"] .rtl\:rotate-180 {
+    transform: rotate(180deg);
+  }
+}
+
+@layer components {
+  /* VibeMix Custom Components */
+  .mood-card {
+    @apply relative overflow-hidden rounded-2xl p-6 transition-all duration-300 ease-out;
+    @apply bg-gradient-to-br from-surface to-surface-elevated;
+    @apply border border-border hover:border-primary/30;
+    @apply hover:scale-105 hover:shadow-mood;
+    @apply cursor-pointer;
+  }
+  
+  .mood-card:hover {
+    box-shadow: var(--shadow-mood);
+  }
+  
+  .mood-card-selected {
+    @apply border-primary bg-gradient-to-br from-primary/5 to-primary/10;
+    box-shadow: var(--shadow-mood);
+  }
+  
+  .genre-chip {
+    @apply inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium;
+    @apply bg-muted text-muted-foreground border border-border;
+    @apply hover:bg-secondary/10 hover:text-secondary hover:border-secondary/30;
+    @apply transition-all duration-200 ease-out cursor-pointer;
+  }
+  
+  .genre-chip-selected {
+    @apply bg-gradient-to-r from-secondary to-secondary-glow text-white border-secondary;
+    box-shadow: var(--shadow-genre);
+  }
+  
+  .language-chip {
+    @apply inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium;
+    @apply bg-muted text-muted-foreground border border-border;
+    @apply hover:bg-accent/10 hover:text-accent hover:border-accent/30;
+    @apply transition-all duration-200 ease-out cursor-pointer;
+  }
+  
+  .language-chip-selected {
+    @apply bg-gradient-to-r from-accent to-accent-glow text-white border-accent;
+    box-shadow: var(--shadow-genre);
+  }
+  
+  .hero-button {
+    @apply relative overflow-hidden px-8 py-4 rounded-2xl font-semibold text-white;
+    @apply transition-all duration-300 ease-out transform hover:scale-105;
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-elevated);
+  }
+  
+  .hero-button:hover {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: var(--shadow-elevated); }
+  50% { box-shadow: var(--shadow-glow); }
 }

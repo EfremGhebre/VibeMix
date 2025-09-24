@@ -56,35 +56,59 @@ const Index = () => {
           >
             <Button onClick={handleGetStarted} className="hero-button text-lg group">
               <Headphones className="mr-3 h-5 w-5 group-hover:animate-bounce" />
-              {t('button.getStarted')}
+              {t('auth.signup')}
               <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </motion.div>
-        </div>
 
-        {/* Featured Moods Preview */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="max-w-3xl mx-auto"
-        >
-          <h2 className="text-2xl font-bold text-center mb-8 text-foreground">
-            Choose your vibe
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredMoods.map((mood, index) => (
-              <MoodCard
-                key={mood.slug}
-                mood={mood}
-                isSelected={false}
-                onClick={handleGetStarted}
-                index={index}
-              />
-            ))}
-          </div>
-        </motion.div>
+          {/* Benefits Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="max-w-4xl mx-auto"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+              <div className="text-center p-6">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <Zap className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Instant Playlist Creation</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Generate perfectly curated playlists in seconds. Just pick your mood, select genres, and let our AI do the magic.
+                </p>
+              </div>
+
+              <div className="text-center p-6">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-secondary/10 flex items-center justify-center">
+                  <Globe className="h-8 w-8 text-secondary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Global Music Discovery</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Explore music from around the world in multiple languages. Discover your next favorite artist from any culture.
+                </p>
+              </div>
+            </div>
+
+            <div className="text-center max-w-2xl mx-auto">
+              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                Join thousands of music lovers who have already discovered their perfect soundtracks. 
+                <span className="text-primary font-medium"> Start your musical journey today!</span>
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button onClick={handleGetStarted} size="lg" className="text-base">
+                  <Headphones className="mr-2 h-5 w-5" />
+                  Create Free Account
+                </Button>
+                <Button variant="outline" size="lg" className="text-base">
+                  <Stars className="mr-2 h-5 w-5" />
+                  See How It Works
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* Features Section */}

@@ -101,7 +101,10 @@ const Index = () => {
                   <Headphones className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Create Free Account
                 </Button>
-                <Button variant="outline" size="lg" className="text-sm sm:text-base h-12 sm:h-14">
+                <Button variant="outline" size="lg" className="text-sm sm:text-base h-12 sm:h-14" onClick={() => {
+                  const element = document.getElementById('how-it-works');
+                  element?.scrollIntoView({ behavior: 'smooth' });
+                }}>
                   <Stars className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   See How It Works
                 </Button>
@@ -109,6 +112,53 @@ const Index = () => {
             </div>
           </motion.div>
         </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="container mx-auto px-4 py-12 sm:py-20 border-t border-border/40">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+          className="text-center max-w-4xl mx-auto mb-12"
+        >
+          <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-6">How It Works</h2>
+          <p className="text-lg text-muted-foreground mb-12">
+            Creating your perfect playlist is just three simple steps away
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
+                1
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Choose Your Mood</h3>
+              <p className="text-muted-foreground">
+                Select from various moods like Happy, Chill, Energetic, or Romantic. Our AI understands the emotional context you're looking for.
+              </p>
+            </div>
+            
+            <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary/10 flex items-center justify-center text-2xl font-bold text-secondary">
+                2
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Pick Genres & Language</h3>
+              <p className="text-muted-foreground">
+                Customize your playlist by selecting genres you love and choose from multiple languages to discover global music.
+              </p>
+            </div>
+            
+            <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/10 flex items-center justify-center text-2xl font-bold text-accent">
+                3
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Get Your Playlist</h3>
+              <p className="text-muted-foreground">
+                Our intelligent algorithm instantly creates a personalized playlist that perfectly matches your mood and preferences.
+              </p>
+            </div>
+          </div>
+        </motion.div>
       </section>
 
       {/* Features Section */}

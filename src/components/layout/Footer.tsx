@@ -1,8 +1,6 @@
 import { Heart, Music } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Footer() {
-  const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
 
   return (

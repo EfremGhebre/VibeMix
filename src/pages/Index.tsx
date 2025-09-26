@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Radio, Headphones, Stars, ArrowRight, Target, Palette, Globe, Smile, Snowflake, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import MoodCard from '@/components/mood/MoodCard';
+import MusicDiscoveryWidget from '@/components/features/MusicDiscoveryWidget';
 
 const featuredMoods = [
   { slug: 'happy', icon: Smile, labelKey: 'mood.happy' },
@@ -56,7 +57,7 @@ const Index = () => {
           >
             <Button onClick={handleGetStarted} className="hero-button text-base sm:text-lg group h-12 sm:h-14 px-6 sm:px-8">
               <Headphones className="mr-2 sm:mr-3 h-5 w-5 group-hover:animate-bounce" />
-              {t('auth.signup')}
+              Start Your Musical Journey
               <ArrowRight className="ml-2 sm:ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </motion.div>
@@ -99,19 +100,35 @@ const Index = () => {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                 <Button onClick={handleGetStarted} size="lg" className="text-sm sm:text-base h-12 sm:h-14">
                   <Headphones className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  Create Free Account
+                  Explore Music
                 </Button>
                 <Button variant="outline" size="lg" className="text-sm sm:text-base h-12 sm:h-14" onClick={() => {
-                  const element = document.getElementById('how-it-works');
+                  const element = document.getElementById('music-discovery');
                   element?.scrollIntoView({ behavior: 'smooth' });
                 }}>
                   <Stars className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  See How It Works
+                  Try Interactive Demo
                 </Button>
               </div>
             </div>
           </motion.div>
         </div>
+      </section>
+
+      {/* Interactive Music Discovery Section */}
+      <section id="music-discovery" className="container mx-auto px-4 py-12 sm:py-20 border-t border-border/40">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-6">Experience VibeMix</h2>
+          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Get a taste of what VibeMix can do. Explore trending genres or preview our curated music selection.
+          </p>
+          <MusicDiscoveryWidget />
+        </motion.div>
       </section>
 
       {/* How It Works Section */}

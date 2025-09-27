@@ -12,6 +12,7 @@ import { useLanguage, type Language } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
 import UserMenu from '@/components/auth/UserMenu';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 const languages: { code: Language; name: string; flag: string }[] = [
@@ -24,6 +25,7 @@ export default function Header() {
   const { theme, setTheme } = useTheme();
   const { t, currentLanguage, changeLanguage, isRTL } = useLanguage();
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState<'login' | 'signup'>('login');
@@ -39,18 +41,18 @@ export default function Header() {
         {/* Desktop Navigation - Only show when user is logged in */}
         {user && (
           <nav className={`hidden lg:flex items-center space-x-6 ${isRTL ? 'space-x-reverse' : ''}`}>
-            <a href="/" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link to="/" className="text-sm font-medium hover:text-primary transition-colors">
               {t('nav.home')}
-            </a>
-            <a href="/discover" className="text-sm font-medium hover:text-primary transition-colors">
+            </Link>
+            <Link to="/discover" className="text-sm font-medium hover:text-primary transition-colors">
               {t('nav.discover')}
-            </a>
-            <a href="/profile" className="text-sm font-medium hover:text-primary transition-colors">
+            </Link>
+            <Link to="/profile" className="text-sm font-medium hover:text-primary transition-colors">
               {t('auth.profile')}
-            </a>
-            <a href="/settings" className="text-sm font-medium hover:text-primary transition-colors">
+            </Link>
+            <Link to="/settings" className="text-sm font-medium hover:text-primary transition-colors">
               {t('nav.settings')}
-            </a>
+            </Link>
           </nav>
         )}
 
@@ -169,16 +171,16 @@ export default function Header() {
                   <div>
                     <h3 className="text-sm font-medium mb-3 text-muted-foreground">Navigation</h3>
                     <div className="grid grid-cols-1 gap-2">
-                      <Button variant="ghost" className="justify-start h-12" onClick={() => { window.location.href = '/'; setIsOpen(false); }}>
+                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/'); setIsOpen(false); }}>
                         {t('nav.home')}
                       </Button>
-                      <Button variant="ghost" className="justify-start h-12" onClick={() => { window.location.href = '/discover'; setIsOpen(false); }}>
+                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/discover'); setIsOpen(false); }}>
                         {t('nav.discover')}
                       </Button>
-                      <Button variant="ghost" className="justify-start h-12" onClick={() => { window.location.href = '/profile'; setIsOpen(false); }}>
+                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/profile'); setIsOpen(false); }}>
                         {t('auth.profile')}
                       </Button>
-                      <Button variant="ghost" className="justify-start h-12" onClick={() => { window.location.href = '/settings'; setIsOpen(false); }}>
+                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/settings'); setIsOpen(false); }}>
                         {t('nav.settings')}
                       </Button>
                     </div>

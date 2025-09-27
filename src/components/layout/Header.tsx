@@ -40,17 +40,17 @@ export default function Header() {
 
         {/* Desktop Navigation - Only show when user is logged in */}
         {user && (
-          <nav className={`hidden lg:flex items-center space-x-6 ${isRTL ? 'space-x-reverse' : ''}`}>
-            <Link to="/" className="text-sm font-medium hover:text-primary transition-colors">
+          <nav className={`hidden lg:flex items-center space-x-1 ${isRTL ? 'space-x-reverse' : ''}`}>
+            <Link to="/" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
               {t('nav.home')}
             </Link>
-            <Link to="/discover" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link to="/discover" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
               {t('nav.discover')}
             </Link>
-            <Link to="/profile" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link to="/profile" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
               {t('auth.profile')}
             </Link>
-            <Link to="/settings" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link to="/settings" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
               {t('nav.settings')}
             </Link>
           </nav>
@@ -116,7 +116,7 @@ export default function Header() {
             variant="ghost" 
             size="sm" 
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className="h-9 w-9"
+            className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0"
           >
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -130,7 +130,7 @@ export default function Header() {
             variant="ghost" 
             size="sm" 
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className="h-9 w-9"
+            className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0"
           >
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />

@@ -63,10 +63,10 @@ export default function Header() {
             <UserMenu />
           ) : (
             <div className={`flex items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
-              <Button 
+               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-sm"
+                className="text-sm hover:text-primary transition-colors"
                 onClick={() => {
                   setAuthModalTab('login');
                   setAuthModalOpen(true);
@@ -75,10 +75,10 @@ export default function Header() {
                 <LogIn className="mr-2 h-4 w-4" />
                 {t('auth.login')}
               </Button>
-              <Button 
+               <Button 
                 variant="default" 
                 size="sm" 
-                className="text-sm"
+                className="text-sm hover:text-primary transition-colors"
                 onClick={() => {
                   setAuthModalTab('signup');
                   setAuthModalOpen(true);
@@ -93,7 +93,7 @@ export default function Header() {
           {/* Language Selector */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0">
+              <Button variant="ghost" size="sm" className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0 hover:text-primary transition-colors">
                 <Globe className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -116,7 +116,7 @@ export default function Header() {
             variant="ghost" 
             size="sm" 
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0 hover:text-primary transition-colors"
           >
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -130,7 +130,7 @@ export default function Header() {
             variant="ghost" 
             size="sm" 
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0 hover:text-primary transition-colors"
           >
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />

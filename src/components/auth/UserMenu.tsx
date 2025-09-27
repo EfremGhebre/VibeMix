@@ -37,9 +37,19 @@ export default function UserMenu() {
     return user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'User';
   };
 
-  // Function to get display name consistently with profile data
-  const getDisplayName = () => {
-    return user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'User';
+  const getLastName = () => {
+    return user?.user_metadata?.last_name || '';
+  };
+
+  const getFullName = () => {
+    const firstName = getFirstName();
+    const lastName = getLastName();
+    return lastName ? `${firstName} ${lastName}` : firstName;
+  };
+
+  const getGreeting = () => {
+    const fullName = getFullName();
+    return `Hi, ${fullName}!`;
   };
 
   return (
@@ -49,7 +59,7 @@ export default function UserMenu() {
           <Avatar className="h-9 w-9 rounded-none">
             <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
             <AvatarFallback className="rounded-none bg-transparent text-xs px-1 whitespace-nowrap overflow-hidden text-ellipsis">
-              Hi, {getFirstName()}!
+              {getGreeting()}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -58,7 +68,7 @@ export default function UserMenu() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              Hi, {getFirstName()}!
+              {getGreeting()}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
               {user?.email}

@@ -24,7 +24,7 @@ const languages: { code: Language; name: string; flag: string }[] = [
 export default function Header() {
   const { theme, setTheme } = useTheme();
   const { t, currentLanguage, changeLanguage, isRTL } = useLanguage();
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, signOut, signingOut } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -124,15 +124,25 @@ export default function Header() {
 
           {/* Sign Out Button - Only show when logged in */}
           {user && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={signOut}
-              className="h-9 px-3 text-sm font-medium hover:text-primary hover:bg-transparent transition-colors inline-flex items-center justify-center"
-            >
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={signOut}
+          disabled={signingOut}
+          className="h-9 px-3 text-sm font-medium hover:text-primary hover:bg-transparent transition-colors inline-flex items-center justify-center disabled:opacity-50"
+        >
+          {signingOut ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+              Signing out...
+            </>
+          ) : (
+            <>
               <LogOut className="mr-2 h-4 w-4" />
               {t('auth.signOut')}
-            </Button>
+            </>
+          )}
+        </Button>
           )}
         </div>
 

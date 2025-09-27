@@ -7,6 +7,7 @@ export interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  signingOut: boolean;
   signUp: (email: string, password: string, userData?: { display_name?: string; username?: string }) => Promise<{ success: boolean; error?: string }>;
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
@@ -20,6 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [signingOut, setSigningOut] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -124,7 +126,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      setLoading(true);
+      setSigningOut(true);
+      
+      // Add a small delay for smooth UX
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const { error } = await supabase.auth.signOut();
       if (error) {
         toast({
@@ -132,13 +138,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           description: "Error signing out",
           variant: "destructive",
         });
+        setSigningOut(false);
       } else {
         toast({
           title: "Success",
           description: "Signed out successfully",
         });
-        // Redirect to home page after successful sign out
-        window.location.href = '/';
+        
+        // Add fade out effect before redirect
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.3s ease-out';
+        
+        setTimeout(() => {
+          setSigningOut(false);
+          window.location.href = '/';
+        }, 300);
       }
     } catch (error) {
       toast({
@@ -146,8 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: "Error signing out",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
+      setSigningOut(false);
     }
   };
 
@@ -203,6 +216,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     session,
     loading,
+    signingOut,
     signUp,
     signIn,
     signOut,
@@ -212,7 +226,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {signingOut ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur">
+          <div className="flex flex-col items-center space-y-4 animate-fade-in">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <p className="text-lg font-medium text-muted-foreground animate-pulse">
+              Signing you out...
+            </p>
+          </div>
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 }

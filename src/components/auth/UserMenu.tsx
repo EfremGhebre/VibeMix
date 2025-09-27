@@ -11,11 +11,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { User, Settings, LogOut, Music } from 'lucide-react';
+import { User, Settings, LogOut, Music, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function UserMenu() {
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
@@ -29,6 +31,13 @@ export default function UserMenu() {
       .join('')
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const getFirstName = () => {
+    if (user?.user_metadata?.display_name) {
+      return user.user_metadata.display_name.split(' ')[0];
+    }
+    return user?.email?.split('@')[0] || 'User';
   };
 
   return (
@@ -47,22 +56,22 @@ export default function UserMenu() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {user?.user_metadata?.display_name || user?.email?.split('@')[0]}
-            </p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {user?.email}
+              Hi, {getFirstName()}!
             </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => window.location.href = '/playlists'}>
-          <Music className="mr-2 h-4 w-4" />
-          <span>{t('auth.myPlaylists')}</span>
+        <DropdownMenuItem onClick={() => navigate('/profile')}>
+          <User className="mr-2 h-4 w-4" />
+          <span>{t('auth.profile')}</span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut}>
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>{t('auth.signOut')}</span>
+        <DropdownMenuItem onClick={() => navigate('/favorites')}>
+          <Heart className="mr-2 h-4 w-4" />
+          <span>My Favorites</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/settings')}>
+          <Settings className="mr-2 h-4 w-4" />
+          <span>{t('nav.settings')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

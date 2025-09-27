@@ -25,11 +25,15 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
 
-  // Remove console logs for production
+  // Fetch profile data from database
   const fetchProfile = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user found, skipping profile fetch');
+      return;
+    }
     
     try {
+      console.log('Fetching profile for user:', user.id);
       setProfileLoading(true);
       
       const { data, error } = await supabase
@@ -37,6 +41,8 @@ export default function Profile() {
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
+
+      console.log('Profile fetch result:', { data, error });
 
       if (error) {
         console.error('Error fetching profile:', error);
@@ -55,13 +61,14 @@ export default function Profile() {
       }
 
       if (data) {
+        console.log('Profile data found:', data);
         setProfileData({
           display_name: data.display_name || user.email?.split('@')[0] || '',
           username: data.username || user.email?.split('@')[0] || '',
           bio: data.bio || '',
         });
       } else {
-        // No profile found, set default values
+        console.log('No profile found, using defaults');
         setProfileData({
           display_name: user.email?.split('@')[0] || '',
           username: user.email?.split('@')[0] || '',
@@ -82,31 +89,50 @@ export default function Profile() {
         bio: '',
       });
     } finally {
+      console.log('Profile fetch complete, setting loading false');
       setProfileLoading(false);
     }
   };
 
   useEffect(() => {
+    console.log('Profile useEffect triggered, user:', user);
     if (user) {
       fetchProfile();
+    } else {
+      console.log('No user, resetting profile loading');
+      setProfileLoading(false);
     }
   }, [user]);
 
   const handleSave = async () => {
+    console.log('Attempting to save profile data:', profileData);
     setIsLoading(true);
-    const result = await updateProfile(profileData);
-    if (result.success) {
-      setIsEditing(false);
-      // Refresh profile data to show the updated information
-      await fetchProfile();
-    } else {
+    
+    try {
+      const result = await updateProfile(profileData);
+      console.log('Update result:', result);
+      
+      if (result.success) {
+        setIsEditing(false);
+        // Refresh profile data to show the updated information
+        await fetchProfile();
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || 'Failed to update profile',
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error in handleSave:', error);
       toast({
         title: "Error",
-        description: result.error || 'Failed to update profile',
+        description: 'Failed to update profile',
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

@@ -128,9 +128,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setSigningOut(true);
       
-      // Add a small delay for smooth UX
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
       const { error } = await supabase.auth.signOut();
       if (error) {
         toast({
@@ -145,14 +142,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           description: "Signed out successfully",
         });
         
-        // Add fade out effect before redirect
-        document.body.style.opacity = '0';
-        document.body.style.transition = 'opacity 0.3s ease-out';
-        
+        // Simple redirect without additional effects
         setTimeout(() => {
           setSigningOut(false);
           window.location.href = '/';
-        }, 300);
+        }, 1000);
       }
     } catch (error) {
       toast({

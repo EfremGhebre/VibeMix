@@ -41,16 +41,16 @@ export default function Header() {
         {/* Desktop Navigation - Only show when user is logged in */}
         {user && (
           <nav className={`hidden lg:flex items-center space-x-1 ${isRTL ? 'space-x-reverse' : ''}`}>
-            <Link to="/" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
+            <Link to="/" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
               {t('nav.home')}
             </Link>
-            <Link to="/discover" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
+            <Link to="/discover" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
               {t('nav.discover')}
             </Link>
-            <Link to="/profile" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
+            <Link to="/profile" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
               {t('auth.profile')}
             </Link>
-            <Link to="/settings" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
+            <Link to="/settings" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
               {t('nav.settings')}
             </Link>
           </nav>

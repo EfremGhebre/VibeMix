@@ -55,17 +55,9 @@ export default function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => window.location.href = '/profile'}>
-          <User className="mr-2 h-4 w-4" />
-          <span>{t('auth.profile')}</span>
-        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => window.location.href = '/playlists'}>
           <Music className="mr-2 h-4 w-4" />
           <span>{t('auth.myPlaylists')}</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => window.location.href = '/settings'}>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>{t('auth.settings')}</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>

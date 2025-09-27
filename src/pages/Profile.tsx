@@ -25,21 +25,18 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
 
-  // Fetch profile data from database
+  // Remove console logs for production
   const fetchProfile = async () => {
     if (!user) return;
     
     try {
       setProfileLoading(true);
-      console.log('Fetching profile for user:', user.id);
       
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
-
-      console.log('Profile query result:', { data, error });
 
       if (error) {
         console.error('Error fetching profile:', error);
@@ -65,7 +62,6 @@ export default function Profile() {
         });
       } else {
         // No profile found, set default values
-        console.log('No profile found, using defaults');
         setProfileData({
           display_name: user.email?.split('@')[0] || '',
           username: user.email?.split('@')[0] || '',

@@ -40,6 +40,11 @@ export default function UserMenu() {
     return user?.email?.split('@')[0] || 'User';
   };
 
+  // Function to get display name consistently with profile data
+  const getDisplayName = () => {
+    return user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'User';
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -47,7 +52,7 @@ export default function UserMenu() {
           <Avatar className="h-9 w-9 rounded-none">
             <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
             <AvatarFallback className="rounded-none bg-transparent text-xs px-1 whitespace-nowrap overflow-hidden text-ellipsis">
-              Hi, {user?.user_metadata?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}!
+              Hi, {getFirstName()}!
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -57,6 +62,9 @@ export default function UserMenu() {
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
               Hi, {getFirstName()}!
+            </p>
+            <p className="text-xs leading-none text-muted-foreground">
+              {user?.email}
             </p>
           </div>
         </DropdownMenuLabel>

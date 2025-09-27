@@ -60,18 +60,7 @@ export default function Header() {
         <div className={`hidden lg:flex items-center space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
           {/* Auth Section */}
           {user ? (
-            <div className={`flex items-center space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
-              <UserMenu />
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={signOut}
-                className="h-9 px-3 text-sm font-medium hover:text-primary hover:bg-transparent transition-colors inline-flex items-center justify-center"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                {t('auth.signOut')}
-              </Button>
-            </div>
+            <UserMenu />
           ) : (
             <div className={`flex items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
               <Button 
@@ -132,6 +121,19 @@ export default function Header() {
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           </Button>
+
+          {/* Sign Out Button - Only show when logged in */}
+          {user && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={signOut}
+              className="h-9 px-3 text-sm font-medium hover:text-primary hover:bg-transparent transition-colors inline-flex items-center justify-center"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              {t('auth.signOut')}
+            </Button>
+          )}
         </div>
 
         {/* Mobile Controls */}

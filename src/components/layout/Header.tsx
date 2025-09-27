@@ -95,12 +95,12 @@ export default function Header() {
                 <Globe className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align={isRTL ? 'start' : 'end'} className="z-50 bg-background border border-border">
+            <DropdownMenuContent align={isRTL ? 'start' : 'end'} className="z-50">
               {languages.map((lang) => (
                 <DropdownMenuItem
                   key={lang.code}
                   onClick={() => changeLanguage(lang.code)}
-                  className={currentLanguage === lang.code ? 'bg-primary/10' : ''}
+                  className={currentLanguage === lang.code ? 'bg-accent text-accent-foreground' : ''}
                 >
                   <span className={`mr-2 ${isRTL ? 'mr-0 ml-2' : ''}`}>{lang.flag}</span>
                   {lang.name}

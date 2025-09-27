@@ -9,6 +9,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { User, Mail, Calendar, Music, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export default function Profile() {
   const { user, updateProfile, signOut } = useAuth();
@@ -20,14 +22,44 @@ export default function Profile() {
     bio: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
+
+  // Fetch profile data from database
+  const fetchProfile = async () => {
+    if (!user) return;
+    
+    try {
+      setProfileLoading(true);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        toast.error('Failed to load profile data');
+        return;
+      }
+
+      if (data) {
+        setProfileData({
+          display_name: data.display_name || user.email?.split('@')[0] || '',
+          username: data.username || user.email?.split('@')[0] || '',
+          bio: data.bio || '',
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      toast.error('Failed to load profile data');
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (user) {
-      setProfileData({
-        display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || '',
-        username: user.user_metadata?.username || user.email?.split('@')[0] || '',
-        bio: user.user_metadata?.bio || '',
-      });
+      fetchProfile();
     }
   }, [user]);
 
@@ -36,6 +68,10 @@ export default function Profile() {
     const result = await updateProfile(profileData);
     if (result.success) {
       setIsEditing(false);
+      // Refresh profile data to show the updated information
+      await fetchProfile();
+    } else {
+      toast.error(result.error || 'Failed to update profile');
     }
     setIsLoading(false);
   };
@@ -71,6 +107,21 @@ export default function Profile() {
               <Button onClick={() => window.location.href = '/'}>
                 Go Home
               </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (profileLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-md mx-auto text-center">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading profile...</p>
             </CardContent>
           </Card>
         </div>

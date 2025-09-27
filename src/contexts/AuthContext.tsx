@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 export interface AuthContextType {
   user: User | null;
@@ -164,24 +165,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       console.log('Supabase signOut successful - clearing state');
       
-      // Force clear local state immediately 
+      // Clear local state immediately 
       setUser(null);
       setSession(null);
       
-      console.log('State cleared, redirecting...');
+      toast({
+        title: "Success",
+        description: "Signed out successfully",
+      });
       
-      // Force redirect immediately
-      window.location.href = '/';
+      console.log('State cleared - sign out complete');
+      
+      // Don't redirect here - let the auth state change handle it
       
     } catch (error) {
       console.error('Sign out error:', error);
       
+      toast({
+        title: "Error", 
+        description: "Error signing out",
+        variant: "destructive",
+      });
+      
       // Force sign out anyway - clear everything
       setUser(null);
       setSession(null);
-      
-      // Force redirect even on error
-      window.location.href = '/';
       
     } finally {
       setSigningOut(false);
@@ -281,6 +289,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={value}>
+      {signingOut ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-fade-in">
+          <div className="flex flex-col items-center space-y-4 p-8 bg-background/95 rounded-lg border shadow-lg animate-scale-in">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <p className="text-sm font-medium text-muted-foreground">
+              Signing you out...
+            </p>
+          </div>
+        </div>
+      ) : null}
       {children}
     </AuthContext.Provider>
   );

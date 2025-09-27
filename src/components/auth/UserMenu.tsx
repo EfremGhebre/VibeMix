@@ -34,7 +34,7 @@ export default function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+        <Button variant="ghost" size="sm" className="relative h-9 w-9 rounded-full focus-visible:ring-0 focus-visible:ring-offset-0">
           <Avatar className="h-9 w-9">
             <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
             <AvatarFallback>

@@ -33,10 +33,10 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
-        <div className="flex items-center space-x-3">
+        <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
           <Radio className="h-7 w-7 sm:h-8 sm:w-8 text-primary animate-pulse-glow" />
           <h1 className="text-lg sm:text-xl font-bold gradient-text">{t('app.name')}</h1>
-        </div>
+        </Link>
 
         {/* Desktop Navigation - Only show when user is logged in */}
         {user && (

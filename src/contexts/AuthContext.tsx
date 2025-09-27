@@ -127,9 +127,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       setSigningOut(true);
+      console.log('Starting sign out process...');
       
       const { error } = await supabase.auth.signOut();
+      console.log('Sign out result:', { error });
+      
       if (error) {
+        console.error('Sign out error:', error);
         toast({
           title: "Error",
           description: "Error signing out",
@@ -137,18 +141,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
         setSigningOut(false);
       } else {
+        console.log('Sign out successful, redirecting...');
         toast({
           title: "Success",
           description: "Signed out successfully",
         });
         
-        // Simple redirect without additional effects
-        setTimeout(() => {
-          setSigningOut(false);
-          window.location.href = '/';
-        }, 1000);
+        // Immediate redirect on success
+        setSigningOut(false);
+        window.location.href = '/';
       }
     } catch (error) {
+      console.error('Sign out catch error:', error);
       toast({
         title: "Error",
         description: "Error signing out",

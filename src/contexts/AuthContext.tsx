@@ -125,52 +125,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    console.log('=== SIGN OUT STARTED ===');
+    setSigningOut(true);
+    
     try {
-      setSigningOut(true);
-      console.log('Starting sign out process...');
-      
-      // Clear the session first
-      setSession(null);
+      // Force clear local state immediately
+      console.log('Clearing local auth state...');
       setUser(null);
+      setSession(null);
       
-      const { error } = await supabase.auth.signOut();
-      console.log('Supabase sign out result:', { error });
+      // Clear localStorage manually
+      console.log('Clearing localStorage...');
+      localStorage.removeItem('sb-yjdwjprbsduenqlcvxyd-auth-token');
       
-      if (error) {
-        console.error('Sign out error:', error);
-        toast({
-          title: "Error",
-          description: "Error signing out: " + error.message,
-          variant: "destructive",
-        });
-      } else {
-        console.log('Sign out successful');
-        toast({
-          title: "Success",
-          description: "Signed out successfully",
-        });
-      }
+      // Call Supabase signOut
+      console.log('Calling Supabase signOut...');
+      await supabase.auth.signOut();
       
-      // Always redirect regardless of error
-      console.log('Redirecting to home page...');
-      setTimeout(() => {
-        setSigningOut(false);
-        window.location.replace('/');
-      }, 500);
+      console.log('Sign out completed, redirecting...');
+      
+      // Force redirect immediately
+      window.location.replace('/');
       
     } catch (error) {
-      console.error('Sign out catch error:', error);
-      toast({
-        title: "Error",
-        description: "Error signing out",
-        variant: "destructive",
-      });
+      console.error('Sign out error:', error);
       
-      // Still redirect on catch
-      setTimeout(() => {
-        setSigningOut(false);
-        window.location.replace('/');
-      }, 500);
+      // Even if there's an error, force the redirect
+      setUser(null);
+      setSession(null);
+      localStorage.removeItem('sb-yjdwjprbsduenqlcvxyd-auth-token');
+      window.location.replace('/');
     }
   };
 

@@ -55,10 +55,10 @@ export default function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="relative h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0 hover:text-primary hover:bg-transparent transition-colors">
-          <Avatar className="h-9 w-9 rounded-none">
+        <Button variant="ghost" size="sm" className="relative h-9 focus-visible:ring-0 focus-visible:ring-offset-0 hover:text-primary hover:bg-transparent transition-colors">
+          <Avatar className="h-9 rounded-none w-auto min-w-fit">
             <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
-            <AvatarFallback className="rounded-none bg-transparent text-xs px-1 whitespace-nowrap overflow-hidden text-ellipsis">
+            <AvatarFallback className="rounded-none bg-transparent text-xs px-2 w-auto">
               Hi {getFirstName()}
             </AvatarFallback>
           </Avatar>

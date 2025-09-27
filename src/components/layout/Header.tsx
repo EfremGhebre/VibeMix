@@ -9,6 +9,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { useLanguage, type Language } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import AuthModal from '@/components/auth/AuthModal';
+import UserMenu from '@/components/auth/UserMenu';
 import { useState } from 'react';
 
 const languages: { code: Language; name: string; flag: string }[] = [
@@ -20,7 +23,10 @@ const languages: { code: Language; name: string; flag: string }[] = [
 export default function Header() {
   const { theme, setTheme } = useTheme();
   const { t, currentLanguage, changeLanguage, isRTL } = useLanguage();
+  const { user, loading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState<'login' | 'signup'>('login');
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -30,32 +36,57 @@ export default function Header() {
           <h1 className="text-lg sm:text-xl font-bold gradient-text">{t('app.name')}</h1>
         </div>
 
-        {/* Desktop Navigation */}
-        <nav className={`hidden lg:flex items-center space-x-6 ${isRTL ? 'space-x-reverse' : ''}`}>
-          <a href="/" className="text-sm font-medium hover:text-primary transition-colors">
-            {t('nav.home')}
-          </a>
-          <a href="/discover" className="text-sm font-medium hover:text-primary transition-colors">
-            {t('nav.discover')}
-          </a>
-          <a href="/settings" className="text-sm font-medium hover:text-primary transition-colors">
-            {t('nav.settings')}
-          </a>
-        </nav>
+        {/* Desktop Navigation - Only show when user is logged in */}
+        {user && (
+          <nav className={`hidden lg:flex items-center space-x-6 ${isRTL ? 'space-x-reverse' : ''}`}>
+            <a href="/" className="text-sm font-medium hover:text-primary transition-colors">
+              {t('nav.home')}
+            </a>
+            <a href="/discover" className="text-sm font-medium hover:text-primary transition-colors">
+              {t('nav.discover')}
+            </a>
+            <a href="/profile" className="text-sm font-medium hover:text-primary transition-colors">
+              {t('auth.profile')}
+            </a>
+            <a href="/settings" className="text-sm font-medium hover:text-primary transition-colors">
+              {t('nav.settings')}
+            </a>
+          </nav>
+        )}
 
         {/* Desktop Controls */}
         <div className={`hidden lg:flex items-center space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
-          {/* Auth Buttons */}
-          <div className={`flex items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
-            <Button variant="ghost" size="sm" className="text-sm">
-              <LogIn className="mr-2 h-4 w-4" />
-              {t('auth.login')}
-            </Button>
-            <Button variant="default" size="sm" className="text-sm">
-              <UserPlus className="mr-2 h-4 w-4" />
-              {t('auth.signup')}
-            </Button>
-          </div>
+          {/* Auth Section */}
+          {user ? (
+            <UserMenu />
+          ) : (
+            <div className={`flex items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-sm"
+                onClick={() => {
+                  setAuthModalTab('login');
+                  setAuthModalOpen(true);
+                }}
+              >
+                <LogIn className="mr-2 h-4 w-4" />
+                {t('auth.login')}
+              </Button>
+              <Button 
+                variant="default" 
+                size="sm" 
+                className="text-sm"
+                onClick={() => {
+                  setAuthModalTab('signup');
+                  setAuthModalOpen(true);
+                }}
+              >
+                <UserPlus className="mr-2 h-4 w-4" />
+                {t('auth.signup')}
+              </Button>
+            </div>
+          )}
 
           {/* Language Selector */}
           <DropdownMenu>
@@ -133,41 +164,87 @@ export default function Header() {
                   </div>
                 </div>
 
-                {/* Navigation */}
-                <div>
-                  <h3 className="text-sm font-medium mb-3 text-muted-foreground">Navigation</h3>
-                  <div className="grid grid-cols-1 gap-2">
-                    <Button variant="ghost" className="justify-start h-12" onClick={() => { window.location.href = '/'; setIsOpen(false); }}>
-                      {t('nav.home')}
-                    </Button>
-                    <Button variant="ghost" className="justify-start h-12" onClick={() => { window.location.href = '/discover'; setIsOpen(false); }}>
-                      {t('nav.discover')}
-                    </Button>
-                    <Button variant="ghost" className="justify-start h-12" onClick={() => { window.location.href = '/settings'; setIsOpen(false); }}>
-                      {t('nav.settings')}
-                    </Button>
+                {/* Navigation - Only show when user is logged in */}
+                {user && (
+                  <div>
+                    <h3 className="text-sm font-medium mb-3 text-muted-foreground">Navigation</h3>
+                    <div className="grid grid-cols-1 gap-2">
+                      <Button variant="ghost" className="justify-start h-12" onClick={() => { window.location.href = '/'; setIsOpen(false); }}>
+                        {t('nav.home')}
+                      </Button>
+                      <Button variant="ghost" className="justify-start h-12" onClick={() => { window.location.href = '/discover'; setIsOpen(false); }}>
+                        {t('nav.discover')}
+                      </Button>
+                      <Button variant="ghost" className="justify-start h-12" onClick={() => { window.location.href = '/profile'; setIsOpen(false); }}>
+                        {t('auth.profile')}
+                      </Button>
+                      <Button variant="ghost" className="justify-start h-12" onClick={() => { window.location.href = '/settings'; setIsOpen(false); }}>
+                        {t('nav.settings')}
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {/* Auth Buttons */}
+                {/* Auth Section */}
                 <div>
                   <h3 className="text-sm font-medium mb-3 text-muted-foreground">Account</h3>
-                  <div className="grid grid-cols-1 gap-3">
-                    <Button variant="outline" size="lg" className="h-12">
-                      <LogIn className="mr-2 h-4 w-4" />
-                      {t('auth.login')}
-                    </Button>
-                    <Button variant="default" size="lg" className="h-12">
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      {t('auth.signup')}
-                    </Button>
-                  </div>
+                  {user ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
+                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                          <span className="text-sm font-medium">
+                            {user.email?.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">{user.user_metadata?.display_name || user.email?.split('@')[0]}</p>
+                          <p className="text-xs text-muted-foreground">{user.email}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-3">
+                      <Button 
+                        variant="outline" 
+                        size="lg" 
+                        className="h-12"
+                        onClick={() => {
+                          setAuthModalTab('login');
+                          setAuthModalOpen(true);
+                          setIsOpen(false);
+                        }}
+                      >
+                        <LogIn className="mr-2 h-4 w-4" />
+                        {t('auth.login')}
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="lg" 
+                        className="h-12"
+                        onClick={() => {
+                          setAuthModalTab('signup');
+                          setAuthModalOpen(true);
+                          setIsOpen(false);
+                        }}
+                      >
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        {t('auth.signup')}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </SheetContent>
           </Sheet>
         </div>
       </div>
+      
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={authModalOpen} 
+        onClose={() => setAuthModalOpen(false)} 
+        defaultTab={authModalTab}
+      />
     </header>
   );
 }

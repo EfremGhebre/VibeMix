@@ -264,6 +264,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { success: false, error: result.error.message };
       }
 
+      // Also update the user metadata to keep UI in sync
+      if (updates.display_name || updates.avatar_url) {
+        const metadataUpdates: { [key: string]: any } = {};
+        if (updates.display_name) metadataUpdates.display_name = updates.display_name;
+        if (updates.avatar_url) metadataUpdates.avatar_url = updates.avatar_url;
+
+        const { error: metadataError } = await supabase.auth.updateUser({
+          data: metadataUpdates
+        });
+
+        if (metadataError) {
+          console.error('User metadata update error:', metadataError);
+          // Don't fail the whole operation for metadata update errors
+        }
+      }
+
       toast({
         title: "Success",
         description: "Profile updated successfully",

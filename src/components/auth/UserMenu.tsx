@@ -47,7 +47,7 @@ export default function UserMenu() {
           <Avatar className="h-9 w-9 rounded-none">
             <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
             <AvatarFallback className="rounded-none bg-transparent">
-              {user?.email ? getInitials(user.email) : 'U'}
+              Hi, {user?.user_metadata?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}!
             </AvatarFallback>
           </Avatar>
         </Button>

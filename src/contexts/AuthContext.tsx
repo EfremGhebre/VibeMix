@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 export interface AuthContextType {
   user: User | null;
@@ -20,6 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Get initial session
@@ -83,7 +84,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data.user && !data.user.email_confirmed_at) {
-        toast.success('Please check your email to confirm your account');
+        toast({
+          title: "Success",
+          description: "Please check your email to confirm your account",
+        });
       }
 
       return { success: true };
@@ -106,7 +110,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { success: false, error: error.message };
       }
 
-      toast.success('Welcome back!');
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully signed in.",
+      });
       return { success: true };
     } catch (error) {
       return { success: false, error: 'An unexpected error occurred' };
@@ -120,12 +127,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) {
-        toast.error('Error signing out');
+        toast({
+          title: "Error",
+          description: "Error signing out",
+          variant: "destructive",
+        });
       } else {
-        toast.success('Signed out successfully');
+        toast({
+          title: "Success",
+          description: "Signed out successfully",
+        });
+        // Redirect to home page after successful sign out
+        window.location.href = '/';
       }
     } catch (error) {
-      toast.error('Error signing out');
+      toast({
+        title: "Error",
+        description: "Error signing out",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -142,7 +162,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { success: false, error: error.message };
       }
 
-      toast.success('Password reset email sent!');
+      toast({
+        title: "Success",
+        description: "Password reset email sent!",
+      });
       return { success: true };
     } catch (error) {
       return { success: false, error: 'An unexpected error occurred' };
@@ -166,7 +189,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { success: false, error: error.message };
       }
 
-      toast.success('Profile updated successfully');
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
       return { success: true };
     } catch (error) {
       return { success: false, error: 'An unexpected error occurred' };

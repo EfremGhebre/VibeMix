@@ -129,28 +129,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSigningOut(true);
       console.log('Starting sign out process...');
       
+      // Clear the session first
+      setSession(null);
+      setUser(null);
+      
       const { error } = await supabase.auth.signOut();
-      console.log('Sign out result:', { error });
+      console.log('Supabase sign out result:', { error });
       
       if (error) {
         console.error('Sign out error:', error);
         toast({
           title: "Error",
-          description: "Error signing out",
+          description: "Error signing out: " + error.message,
           variant: "destructive",
         });
-        setSigningOut(false);
       } else {
-        console.log('Sign out successful, redirecting...');
+        console.log('Sign out successful');
         toast({
           title: "Success",
           description: "Signed out successfully",
         });
-        
-        // Immediate redirect on success
-        setSigningOut(false);
-        window.location.href = '/';
       }
+      
+      // Always redirect regardless of error
+      console.log('Redirecting to home page...');
+      setTimeout(() => {
+        setSigningOut(false);
+        window.location.replace('/');
+      }, 500);
+      
     } catch (error) {
       console.error('Sign out catch error:', error);
       toast({
@@ -158,7 +165,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: "Error signing out",
         variant: "destructive",
       });
-      setSigningOut(false);
+      
+      // Still redirect on catch
+      setTimeout(() => {
+        setSigningOut(false);
+        window.location.replace('/');
+      }, 500);
     }
   };
 
@@ -188,16 +200,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateProfile = async (updates: { display_name?: string; username?: string; bio?: string; avatar_url?: string }) => {
     try {
       if (!user) {
+        console.error('No user logged in for profile update');
         return { success: false, error: 'No user logged in' };
       }
 
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('user_id', user.id);
+      console.log('Updating profile for user:', user.id, 'with data:', updates);
 
-      if (error) {
-        return { success: false, error: error.message };
+      // First check if profile exists
+      const { data: existingProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      console.log('Existing profile check:', { existingProfile, fetchError });
+
+      let result;
+      
+      if (existingProfile) {
+        // Update existing profile
+        console.log('Updating existing profile');
+        result = await supabase
+          .from('profiles')
+          .update(updates)
+          .eq('user_id', user.id);
+      } else {
+        // Insert new profile
+        console.log('Creating new profile');
+        result = await supabase
+          .from('profiles')
+          .insert({
+            user_id: user.id,
+            ...updates
+          });
+      }
+
+      console.log('Profile operation result:', result);
+
+      if (result.error) {
+        console.error('Profile update/insert error:', result.error);
+        return { success: false, error: result.error.message };
       }
 
       toast({
@@ -206,6 +248,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       return { success: true };
     } catch (error) {
+      console.error('Profile update catch error:', error);
       return { success: false, error: 'An unexpected error occurred' };
     }
   };

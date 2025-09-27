@@ -38,13 +38,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+        console.log('Auth state change:', event, session);
+        
+        if (event === 'SIGNED_OUT' || !session) {
+          // Force clear everything on sign out
+          setSession(null);
+          setUser(null);
+          setLoading(false);
+          console.log('User signed out, cleared state');
+        } else {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
 
-        // Create user profile on sign up
-        if (event === 'SIGNED_IN' && session?.user) {
-          await createUserProfile(session.user);
+          // Create user profile on sign up
+          if (event === 'SIGNED_IN' && session?.user) {
+            await createUserProfile(session.user);
+          }
         }
       }
     );
@@ -127,20 +137,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     console.log('=== SIGN OUT STARTED ===');
     
+    // Prevent multiple calls
+    if (signingOut) {
+      console.log('Sign out already in progress, ignoring...');
+      return;
+    }
+    
+    setSigningOut(true);
+    
     try {
-      // Don't set signingOut to true - just do the sign out immediately
       console.log('Clearing auth state and signing out...');
       
-      // Clear Supabase auth
-      await supabase.auth.signOut();
+      // Clear Supabase auth first
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Supabase signOut error:', error);
+      }
       
-      // Clear local state
+      // Force clear local state
       setUser(null);
       setSession(null);
       
-      // Force immediate redirect without loading state
-      console.log('Redirecting immediately...');
-      window.location.href = '/';
+      console.log('Redirecting to home...');
+      
+      // Use replace to prevent back button issues
+      window.location.replace('/');
       
     } catch (error) {
       console.error('Sign out error:', error);
@@ -148,7 +169,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Force sign out even on error
       setUser(null);
       setSession(null);
-      window.location.href = '/';
+      window.location.replace('/');
+    } finally {
+      setSigningOut(false);
     }
   };
 

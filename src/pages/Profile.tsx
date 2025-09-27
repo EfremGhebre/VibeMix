@@ -93,7 +93,7 @@ export default function Profile() {
                 <Avatar className="h-24 w-24">
                   <AvatarImage src={user.user_metadata?.avatar_url} alt={user.email} />
                   <AvatarFallback className="text-2xl">
-                    {user.email ? getInitials(user.email) : 'U'}
+                    {profileData.display_name || user.user_metadata?.display_name || user.email?.split('@')[0] || 'User'}
                   </AvatarFallback>
                 </Avatar>
               </div>

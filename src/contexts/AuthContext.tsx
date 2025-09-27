@@ -137,41 +137,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     console.log('=== SIGN OUT STARTED ===');
     
-    // Prevent multiple calls
-    if (signingOut) {
-      console.log('Sign out already in progress, ignoring...');
-      return;
-    }
-    
-    setSigningOut(true);
-    
     try {
-      console.log('Clearing auth state and signing out...');
+      console.log('Calling Supabase signOut...');
       
-      // Clear Supabase auth first
+      // Call Supabase signOut and wait for it
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Supabase signOut error:', error);
+        throw error;
       }
       
-      // Force clear local state
+      console.log('Supabase signOut successful');
+      
+      // Clear local state immediately after successful signOut
       setUser(null);
       setSession(null);
       
+      // Show success message
+      toast({
+        title: "Success",
+        description: "Signed out successfully",
+      });
+      
       console.log('Redirecting to home...');
       
-      // Use replace to prevent back button issues
-      window.location.replace('/');
+      // Redirect after a brief moment to show the toast
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 500);
       
     } catch (error) {
       console.error('Sign out error:', error);
       
-      // Force sign out even on error
+      // Show error message
+      toast({
+        title: "Error", 
+        description: "Error signing out",
+        variant: "destructive",
+      });
+      
+      // Force sign out anyway
       setUser(null);
       setSession(null);
-      window.location.replace('/');
-    } finally {
-      setSigningOut(false);
+      
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
     }
   };
 

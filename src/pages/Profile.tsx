@@ -18,8 +18,8 @@ export default function Profile() {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
-    display_name: '',
-    username: '',
+    first_name: '',
+    last_name: '',
     bio: '',
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -53,8 +53,8 @@ export default function Profile() {
         });
         // Set default values even if there's an error
         setProfileData({
-          display_name: user.email?.split('@')[0] || '',
-          username: user.email?.split('@')[0] || '',
+          first_name: user.email?.split('@')[0] || '',
+          last_name: '',
           bio: '',
         });
         return;
@@ -63,15 +63,15 @@ export default function Profile() {
       if (data) {
         console.log('Profile data found:', data);
         setProfileData({
-          display_name: data.display_name || user.email?.split('@')[0] || '',
-          username: data.username || user.email?.split('@')[0] || '',
+          first_name: data.first_name || user.email?.split('@')[0] || '',
+          last_name: data.last_name || '',
           bio: data.bio || '',
         });
       } else {
         console.log('No profile found, using defaults');
         setProfileData({
-          display_name: user.email?.split('@')[0] || '',
-          username: user.email?.split('@')[0] || '',
+          first_name: user.email?.split('@')[0] || '',
+          last_name: '',
           bio: '',
         });
       }
@@ -84,8 +84,8 @@ export default function Profile() {
       });
       // Set default values on error
       setProfileData({
-        display_name: user.email?.split('@')[0] || '',
-        username: user.email?.split('@')[0] || '',
+        first_name: user.email?.split('@')[0] || '',
+        last_name: '',
         bio: '',
       });
     } finally {
@@ -203,15 +203,17 @@ export default function Profile() {
                 <Avatar className="h-24 w-24">
                   <AvatarImage src={user.user_metadata?.avatar_url} alt={user.email} />
                   <AvatarFallback className="text-2xl">
-                    {profileData.display_name || user.user_metadata?.display_name || user.email?.split('@')[0] || 'User'}
+                    {getInitials(user.email || 'User')}
                   </AvatarFallback>
                 </Avatar>
               </div>
               <CardTitle className="text-2xl">
-                {profileData.display_name || user.email?.split('@')[0]}
+                {profileData.first_name && profileData.last_name 
+                  ? `${profileData.first_name} ${profileData.last_name}`
+                  : profileData.first_name || user.email?.split('@')[0]}
               </CardTitle>
               <CardDescription className="text-lg">
-                @{profileData.username || user.email?.split('@')[0]}
+                {user.email}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -238,21 +240,21 @@ export default function Profile() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="display_name">Display Name</Label>
+                  <Label htmlFor="first_name">First Name</Label>
                   <Input
-                    id="display_name"
-                    name="display_name"
-                    value={profileData.display_name}
+                    id="first_name"
+                    name="first_name"
+                    value={profileData.first_name}
                     onChange={handleInputChange}
                     disabled={!isEditing}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
+                  <Label htmlFor="last_name">Last Name</Label>
                   <Input
-                    id="username"
-                    name="username"
-                    value={profileData.username}
+                    id="last_name"
+                    name="last_name"
+                    value={profileData.last_name}
                     onChange={handleInputChange}
                     disabled={!isEditing}
                   />

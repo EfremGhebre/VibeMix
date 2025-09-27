@@ -18,8 +18,8 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
     email: '',
     password: '',
     confirmPassword: '',
-    displayName: '',
-    username: '',
+    firstName: '',
+    lastName: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -46,8 +46,8 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
       formData.email,
       formData.password,
       {
-        display_name: formData.displayName,
-        username: formData.username,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
       }
     );
     
@@ -71,28 +71,28 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="displayName">{t('auth.displayName')}</Label>
+          <Label htmlFor="firstName">{t('auth.firstName')}</Label>
           <Input
-            id="displayName"
-            name="displayName"
+            id="firstName"
+            name="firstName"
             type="text"
-            value={formData.displayName}
+            value={formData.firstName}
             onChange={handleInputChange}
-            placeholder={t('auth.displayNamePlaceholder')}
+            placeholder="First Name"
             required
             disabled={isSubmitting}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="username">{t('auth.username')}</Label>
+          <Label htmlFor="lastName">{t('auth.lastName')}</Label>
           <Input
-            id="username"
-            name="username"
+            id="lastName"
+            name="lastName"
             type="text"
-            value={formData.username}
+            value={formData.lastName}
             onChange={handleInputChange}
-            placeholder={t('auth.usernamePlaceholder')}
+            placeholder="Last Name"
             required
             disabled={isSubmitting}
           />

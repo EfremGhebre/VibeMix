@@ -9,11 +9,11 @@ export interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signingOut: boolean;
-  signUp: (email: string, password: string, userData?: { display_name?: string; username?: string }) => Promise<{ success: boolean; error?: string }>;
+  signUp: (email: string, password: string, userData?: { first_name?: string; last_name?: string }) => Promise<{ success: boolean; error?: string }>;
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
-  updateProfile: (updates: { display_name?: string; username?: string; bio?: string; avatar_url?: string }) => Promise<{ success: boolean; error?: string }>;
+  updateProfile: (updates: { first_name?: string; last_name?: string; bio?: string; avatar_url?: string }) => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -75,8 +75,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .from('profiles')
         .insert({
           user_id: user.id,
-          display_name: user.user_metadata?.display_name || user.email?.split('@')[0],
-          username: user.user_metadata?.username || user.email?.split('@')[0],
+          first_name: user.user_metadata?.first_name || user.email?.split('@')[0],
+          last_name: user.user_metadata?.last_name || '',
         });
 
       if (error) {
@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, userData?: { display_name?: string; username?: string }) => {
+  const signUp = async (email: string, password: string, userData?: { first_name?: string; last_name?: string }) => {
     try {
       setLoading(true);
       const { data, error } = await supabase.auth.signUp({
@@ -219,7 +219,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateProfile = async (updates: { display_name?: string; username?: string; bio?: string; avatar_url?: string }) => {
+  const updateProfile = async (updates: { first_name?: string; last_name?: string; bio?: string; avatar_url?: string }) => {
     try {
       if (!user) {
         console.error('No user logged in for profile update');
@@ -265,9 +265,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Also update the user metadata to keep UI in sync
-      if (updates.display_name || updates.avatar_url) {
+      if (updates.first_name || updates.last_name || updates.avatar_url) {
         const metadataUpdates: { [key: string]: any } = {};
-        if (updates.display_name) metadataUpdates.display_name = updates.display_name;
+        if (updates.first_name) metadataUpdates.first_name = updates.first_name;
+        if (updates.last_name) metadataUpdates.last_name = updates.last_name;
         if (updates.avatar_url) metadataUpdates.avatar_url = updates.avatar_url;
 
         const { error: metadataError } = await supabase.auth.updateUser({

@@ -10,11 +10,12 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { User, Mail, Calendar, Music, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Profile() {
   const { user, updateProfile, signOut } = useAuth();
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
     display_name: '',
@@ -30,15 +31,29 @@ export default function Profile() {
     
     try {
       setProfileLoading(true);
+      console.log('Fetching profile for user:', user.id);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
+
+      console.log('Profile query result:', { data, error });
 
       if (error) {
         console.error('Error fetching profile:', error);
-        toast.error('Failed to load profile data');
+        toast({
+          title: "Error",
+          description: "Failed to load profile data",
+          variant: "destructive",
+        });
+        // Set default values even if there's an error
+        setProfileData({
+          display_name: user.email?.split('@')[0] || '',
+          username: user.email?.split('@')[0] || '',
+          bio: '',
+        });
         return;
       }
 
@@ -48,10 +63,28 @@ export default function Profile() {
           username: data.username || user.email?.split('@')[0] || '',
           bio: data.bio || '',
         });
+      } else {
+        // No profile found, set default values
+        console.log('No profile found, using defaults');
+        setProfileData({
+          display_name: user.email?.split('@')[0] || '',
+          username: user.email?.split('@')[0] || '',
+          bio: '',
+        });
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
-      toast.error('Failed to load profile data');
+      toast({
+        title: "Error",
+        description: "Failed to load profile data",
+        variant: "destructive",
+      });
+      // Set default values on error
+      setProfileData({
+        display_name: user.email?.split('@')[0] || '',
+        username: user.email?.split('@')[0] || '',
+        bio: '',
+      });
     } finally {
       setProfileLoading(false);
     }
@@ -71,7 +104,11 @@ export default function Profile() {
       // Refresh profile data to show the updated information
       await fetchProfile();
     } else {
-      toast.error(result.error || 'Failed to update profile');
+      toast({
+        title: "Error",
+        description: result.error || 'Failed to update profile',
+        variant: "destructive",
+      });
     }
     setIsLoading(false);
   };

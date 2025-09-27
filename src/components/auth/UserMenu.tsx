@@ -59,7 +59,7 @@ export default function UserMenu() {
           <Avatar className="h-9 w-9 rounded-none">
             <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
             <AvatarFallback className="rounded-none bg-transparent text-xs px-1 whitespace-nowrap overflow-hidden text-ellipsis">
-              {getGreeting()}
+              Hi {getFirstName()}
             </AvatarFallback>
           </Avatar>
         </Button>

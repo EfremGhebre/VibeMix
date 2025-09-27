@@ -46,7 +46,7 @@ export default function UserMenu() {
         <Button variant="ghost" size="sm" className="relative h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0 hover:text-primary hover:bg-transparent transition-colors">
           <Avatar className="h-9 w-9 rounded-none">
             <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
-            <AvatarFallback className="rounded-none bg-transparent">
+            <AvatarFallback className="rounded-none bg-transparent text-xs px-1 whitespace-nowrap overflow-hidden text-ellipsis">
               Hi, {user?.user_metadata?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}!
             </AvatarFallback>
           </Avatar>

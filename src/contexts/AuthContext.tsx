@@ -126,35 +126,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     console.log('=== SIGN OUT STARTED ===');
-    setSigningOut(true);
     
     try {
-      // Force clear local state immediately
-      console.log('Clearing local auth state...');
+      // Don't set signingOut to true - just do the sign out immediately
+      console.log('Clearing auth state and signing out...');
+      
+      // Clear Supabase auth
+      await supabase.auth.signOut();
+      
+      // Clear local state
       setUser(null);
       setSession(null);
       
-      // Clear localStorage manually
-      console.log('Clearing localStorage...');
-      localStorage.removeItem('sb-yjdwjprbsduenqlcvxyd-auth-token');
-      
-      // Call Supabase signOut
-      console.log('Calling Supabase signOut...');
-      await supabase.auth.signOut();
-      
-      console.log('Sign out completed, redirecting...');
-      
-      // Force redirect immediately
-      window.location.replace('/');
+      // Force immediate redirect without loading state
+      console.log('Redirecting immediately...');
+      window.location.href = '/';
       
     } catch (error) {
       console.error('Sign out error:', error);
       
-      // Even if there's an error, force the redirect
+      // Force sign out even on error
       setUser(null);
       setSession(null);
-      localStorage.removeItem('sb-yjdwjprbsduenqlcvxyd-auth-token');
-      window.location.replace('/');
+      window.location.href = '/';
     }
   };
 
@@ -251,18 +245,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {signingOut ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur">
-          <div className="flex flex-col items-center space-y-4 animate-fade-in">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            <p className="text-lg font-medium text-muted-foreground animate-pulse">
-              Signing you out...
-            </p>
-          </div>
-        </div>
-      ) : (
-        children
-      )}
+      {children}
     </AuthContext.Provider>
   );
 }

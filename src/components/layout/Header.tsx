@@ -1,4 +1,4 @@
-import { Moon, Sun, Globe, Radio, LogIn, UserPlus, Menu, X } from 'lucide-react';
+import { Moon, Sun, Globe, Radio, LogIn, UserPlus, Menu, X, LogOut } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { 
@@ -24,7 +24,7 @@ const languages: { code: Language; name: string; flag: string }[] = [
 export default function Header() {
   const { theme, setTheme } = useTheme();
   const { t, currentLanguage, changeLanguage, isRTL } = useLanguage();
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -60,10 +60,21 @@ export default function Header() {
         <div className={`hidden lg:flex items-center space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
           {/* Auth Section */}
           {user ? (
-            <UserMenu />
+            <div className={`flex items-center space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
+              <UserMenu />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={signOut}
+                className="h-9 px-3 text-sm font-medium hover:text-primary hover:bg-transparent transition-colors inline-flex items-center justify-center"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                {t('auth.signOut')}
+              </Button>
+            </div>
           ) : (
             <div className={`flex items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
-               <Button 
+              <Button 
                 variant="ghost" 
                 size="sm" 
                 className="text-sm hover:text-primary transition-colors"
@@ -75,7 +86,7 @@ export default function Header() {
                 <LogIn className="mr-2 h-4 w-4" />
                 {t('auth.login')}
               </Button>
-               <Button 
+              <Button 
                 variant="default" 
                 size="sm" 
                 className="text-sm hover:text-primary transition-colors"

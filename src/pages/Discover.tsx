@@ -69,9 +69,24 @@ export default function Discover() {
 
       if (error) {
         console.error('Playlist generation error:', error);
+        
+        // Try to extract the specific error message from the edge function response
+        let errorMessage = "Please make sure you're logged in and have connected Spotify.";
+        
+        if (error.message) {
+          // If it's a supabase error with details
+          try {
+            const errorData = JSON.parse(error.message);
+            errorMessage = errorData.error || error.message;
+          } catch {
+            // If parsing fails, use the message as is
+            errorMessage = error.message;
+          }
+        }
+        
         toast({
           title: "Failed to generate playlist",
-          description: error.message || "Please make sure you're logged in and have connected Spotify.",
+          description: errorMessage,
           variant: "destructive",
         });
         return;

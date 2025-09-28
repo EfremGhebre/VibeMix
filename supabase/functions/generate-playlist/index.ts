@@ -29,10 +29,21 @@ serve(async (req) => {
       .from('user_preferences')
       .select('spotify_access_token, spotify_refresh_token')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
-    if (prefsError || !userPrefs?.spotify_access_token) {
-      console.error('No Spotify access token found:', prefsError);
+    if (prefsError) {
+      console.error('Error fetching user preferences:', prefsError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to fetch user preferences. Please try again.' }), 
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    if (!userPrefs || !userPrefs.spotify_access_token) {
+      console.error('No Spotify access token found:', userPrefs?.spotify_access_token || 'No user preferences record');
       return new Response(
         JSON.stringify({ error: 'Spotify not connected. Please connect your Spotify account first.' }), 
         { 

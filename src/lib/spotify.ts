@@ -17,6 +17,8 @@ const SCOPES = [
 ].join(' ');
 
 export const getSpotifyAuthUrl = () => {
+  console.log('Generated REDIRECT_URI:', REDIRECT_URI);
+  
   const params = new URLSearchParams({
     client_id: SPOTIFY_CLIENT_ID,
     response_type: 'code',
@@ -25,7 +27,10 @@ export const getSpotifyAuthUrl = () => {
     show_dialog: 'true'
   });
 
-  return `https://accounts.spotify.com/authorize?${params.toString()}`;
+  const authUrl = `https://accounts.spotify.com/authorize?${params.toString()}`;
+  console.log('Full Spotify Auth URL:', authUrl);
+  
+  return authUrl;
 };
 
 export const getAccessTokenFromCode = async (code: string) => {

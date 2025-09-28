@@ -145,13 +145,23 @@ const Index = () => {
         >
           <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-6">How It Works</h2>
           <p className="text-lg text-muted-foreground mb-12">
-            Creating your perfect playlist is just three simple steps away
+            Creating your perfect playlist is just four simple steps away
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/10 flex items-center justify-center text-2xl font-bold text-green-500">
+                1
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Connect Spotify</h3>
+              <p className="text-muted-foreground">
+                Link your Spotify account to access millions of songs and save your generated playlists directly to your music library.
+              </p>
+            </div>
+            
             <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
-                1
+                2
               </div>
               <h3 className="text-xl font-semibold mb-3">Choose Your Mood</h3>
               <p className="text-muted-foreground">
@@ -161,7 +171,7 @@ const Index = () => {
             
             <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary/10 flex items-center justify-center text-2xl font-bold text-secondary">
-                2
+                3
               </div>
               <h3 className="text-xl font-semibold mb-3">Pick Genres & Language</h3>
               <p className="text-muted-foreground">
@@ -171,7 +181,7 @@ const Index = () => {
             
             <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/10 flex items-center justify-center text-2xl font-bold text-accent">
-                3
+                4
               </div>
               <h3 className="text-xl font-semibold mb-3">Get Your Playlist</h3>
               <p className="text-muted-foreground">

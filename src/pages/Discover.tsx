@@ -7,6 +7,8 @@ import MoodGrid from '@/components/mood/MoodGrid';
 import GenreFilter from '@/components/filters/GenreFilter';
 import LanguageFilter from '@/components/filters/LanguageFilter';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Discover() {
   const [selectedMood, setSelectedMood] = useState<string>('');
@@ -15,6 +17,7 @@ export default function Discover() {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { user } = useAuth();
 
   const handleGenreToggle = (genre: string) => {
     setSelectedGenres(prev => 
@@ -53,14 +56,48 @@ export default function Discover() {
 
     setIsGenerating(true);
 
-    // Simulate playlist generation (will connect to Supabase later)
-    setTimeout(() => {
-      setIsGenerating(false);
+    try {
+      // Call our playlist generation edge function
+      const { data, error } = await supabase.functions.invoke('generate-playlist', {
+        body: {
+          mood: selectedMood,
+          genres: selectedGenres,
+          languages: selectedLanguages,
+          userId: user?.id,
+        }
+      });
+
+      if (error) {
+        console.error('Playlist generation error:', error);
+        toast({
+          title: "Failed to generate playlist",
+          description: error.message || "Please make sure you're logged in and have connected Spotify.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const playlist = data.playlist;
       toast({
         title: "🎵 Playlist generated!",
-        description: `Created a ${selectedMood} playlist with ${selectedGenres.join(', ')} music in ${selectedLanguages.length} language${selectedLanguages.length > 1 ? 's' : ''}`,
+        description: `Created "${playlist.title}" with ${playlist.track_count} tracks. Check your profile to view it!`,
       });
-    }, 2000);
+
+      // Reset form
+      setSelectedMood('');
+      setSelectedGenres(['Pop']);
+      setSelectedLanguages(['en']);
+
+    } catch (error) {
+      console.error('Error generating playlist:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate playlist. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const canGeneratePlaylist = selectedMood && selectedGenres.length > 0 && selectedLanguages.length > 0;

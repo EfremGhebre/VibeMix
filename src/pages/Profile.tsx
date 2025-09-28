@@ -7,10 +7,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { User, Mail, Calendar, Music, Heart } from 'lucide-react';
+import { User, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import PlaylistList from '@/components/playlist/PlaylistList';
 
 export default function Profile() {
   const { user, updateProfile, signOut } = useAuth();
@@ -299,7 +300,7 @@ export default function Profile() {
           </Card>
         </motion.div>
 
-        {/* Stats */}
+        {/* Playlists */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -307,26 +308,13 @@ export default function Profile() {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Your Music Journey</CardTitle>
+              <CardTitle>Your Playlists</CardTitle>
+              <CardDescription>
+                Discover and manage your personalized music collections
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <Music className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <div className="text-2xl font-bold">0</div>
-                  <div className="text-sm text-muted-foreground">Playlists</div>
-                </div>
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <Heart className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <div className="text-2xl font-bold">0</div>
-                  <div className="text-sm text-muted-foreground">Favorites</div>
-                </div>
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <Calendar className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <div className="text-2xl font-bold">0</div>
-                  <div className="text-sm text-muted-foreground">Days Active</div>
-                </div>
-              </div>
+              <PlaylistList limit={6} showCreateButton={true} />
             </CardContent>
           </Card>
         </motion.div>

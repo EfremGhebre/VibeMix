@@ -2,3 +2,6 @@ project_id = "yjdwjprbsduenqlcvxyd"
 
 [functions.spotify-token]
 verify_jwt = false
+
+[functions.generate-playlist]
+verify_jwt = false

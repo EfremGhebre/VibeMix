@@ -12,11 +12,13 @@ import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import PlaylistList from '@/components/playlist/PlaylistList';
+import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
   const { user, updateProfile, signOut } = useAuth();
   const { t } = useLanguage();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
     first_name: '',
@@ -164,7 +166,7 @@ export default function Profile() {
               <p className="text-muted-foreground mb-4">
                 You need to be logged in to view your profile.
               </p>
-              <Button onClick={() => window.location.href = '/'}>
+              <Button onClick={() => navigate('/')}>
                 Go Home
               </Button>
             </CardContent>
@@ -334,7 +336,7 @@ export default function Profile() {
                 <Button
                   variant="outline"
                   className="w-full justify-start"
-                  onClick={() => window.location.href = '/settings'}
+                  onClick={() => navigate('/settings')}
                 >
                   <User className="mr-2 h-4 w-4" />
                   Account Settings

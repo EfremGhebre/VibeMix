@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useNavigate } from 'react-router-dom';
 
 const trendingGenres = [
   { name: 'Lo-Fi Hip Hop', growth: '+24%', color: 'bg-purple-500' },
@@ -51,6 +52,7 @@ export default function MusicDiscoveryWidget() {
   const [currentTrack, setCurrentTrack] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isPlaying) {
@@ -142,7 +144,7 @@ export default function MusicDiscoveryWidget() {
                     Ready to explore these trending sounds?
                   </p>
                   <Button 
-                    onClick={() => window.location.href = '/discover'}
+                    onClick={() => navigate('/discover')}
                     className="hero-button group"
                   >
                     <Play className="h-4 w-4 mr-2 group-hover:animate-bounce" />
@@ -214,7 +216,7 @@ export default function MusicDiscoveryWidget() {
                     This is just a preview of what VibeMix can create for you
                   </p>
                   <Button 
-                    onClick={() => window.location.href = '/discover'}
+                    onClick={() => navigate('/discover')}
                     className="hero-button group"
                   >
                     <Sparkles className="h-4 w-4 mr-2 group-hover:animate-bounce" />

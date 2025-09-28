@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Music, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 interface Playlist {
   id: string;
@@ -31,6 +32,7 @@ export default function PlaylistList({
 }: PlaylistListProps) {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -113,7 +115,7 @@ export default function PlaylistList({
   };
 
   const handleCreatePlaylist = () => {
-    window.location.href = '/discover';
+    navigate('/discover');
   };
 
   if (loading) {

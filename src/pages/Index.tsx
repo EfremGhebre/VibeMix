@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import MoodCard from '@/components/mood/MoodCard';
 import MusicDiscoveryWidget from '@/components/features/MusicDiscoveryWidget';
 import { SpotifyConnectButton } from '@/components/spotify/SpotifyConnectButton';
+import { useNavigate } from 'react-router-dom';
 
 const featuredMoods = [
   { slug: 'happy', icon: Smile, labelKey: 'mood.happy' },
@@ -14,9 +15,10 @@ const featuredMoods = [
 
 const Index = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    window.location.href = '/discover';
+    navigate('/discover');
   };
 
   return (

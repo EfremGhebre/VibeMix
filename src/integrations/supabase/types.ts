@@ -469,6 +469,10 @@ export type Database = {
           id: string
           language: string | null
           notifications_enabled: boolean | null
+          spotify_access_token: string | null
+          spotify_display_name: string | null
+          spotify_refresh_token: string | null
+          spotify_user_id: string | null
           theme: string | null
           updated_at: string
           user_id: string
@@ -481,6 +485,10 @@ export type Database = {
           id?: string
           language?: string | null
           notifications_enabled?: boolean | null
+          spotify_access_token?: string | null
+          spotify_display_name?: string | null
+          spotify_refresh_token?: string | null
+          spotify_user_id?: string | null
           theme?: string | null
           updated_at?: string
           user_id: string
@@ -493,6 +501,10 @@ export type Database = {
           id?: string
           language?: string | null
           notifications_enabled?: boolean | null
+          spotify_access_token?: string | null
+          spotify_display_name?: string | null
+          spotify_refresh_token?: string | null
+          spotify_user_id?: string | null
           theme?: string | null
           updated_at?: string
           user_id?: string

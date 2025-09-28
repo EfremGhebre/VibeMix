@@ -4,6 +4,7 @@ import { Radio, Headphones, Stars, ArrowRight, Target, Palette, Globe, Smile, Sn
 import { useLanguage } from '@/contexts/LanguageContext';
 import MoodCard from '@/components/mood/MoodCard';
 import MusicDiscoveryWidget from '@/components/features/MusicDiscoveryWidget';
+import { SpotifyConnectButton } from '@/components/spotify/SpotifyConnectButton';
 
 const featuredMoods = [
   { slug: 'happy', icon: Smile, labelKey: 'mood.happy' },
@@ -109,6 +110,7 @@ const Index = () => {
                   <Stars className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Try Interactive Demo
                 </Button>
+                <SpotifyConnectButton variant="secondary" size="lg" className="text-sm sm:text-base h-12 sm:h-14" />
               </div>
             </div>
           </motion.div>

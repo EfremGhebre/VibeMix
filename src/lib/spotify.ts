@@ -29,7 +29,7 @@ export const getSpotifyAuthUrl = () => {
 };
 
 export const getAccessTokenFromCode = async (code: string) => {
-  const response = await fetch('/api/spotify/token', {
+  const response = await fetch('https://yjdwjprbsduenqlcvxyd.supabase.co/functions/v1/spotify-token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

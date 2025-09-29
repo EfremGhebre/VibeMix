@@ -1,69 +1,71 @@
-import { Heart, Music } from 'lucide-react';
+import { Heart, Music, Globe } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-surface/30 border-t border-border/40 backdrop-blur-sm">
-      <div className="container mx-auto px-4 py-8 sm:py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-          {/* Company Info */}
-          <div className="text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start mb-4">
-              <Music className="h-6 w-6 text-primary mr-2" />
-              <h3 className="text-lg font-bold gradient-text">VibeMix</h3>
+    <footer className="bg-surface/20 border-t border-border/30 backdrop-blur-md">
+      <div className="container mx-auto px-4 py-6">
+        {/* Main Footer Content */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          {/* Brand Section */}
+          <div className="flex items-center gap-6">
+            <div className="flex items-center">
+              <div className="relative">
+                <Music className="h-5 w-5 text-primary mr-2" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+              </div>
+              <span className="text-lg font-bold gradient-text">VibeMix</span>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Crafting perfect playlists for every mood and moment. 
-              Discover your soundtrack to life.
+            <div className="hidden sm:block w-px h-8 bg-border/40"></div>
+            <p className="hidden sm:block text-sm text-muted-foreground">
+              Your soundtrack to life
             </p>
           </div>
 
-          {/* Quick Links */}
-          <div className="text-center">
-            <h4 className="text-sm font-semibold text-foreground mb-4">Quick Links</h4>
-            <div className="space-y-2">
-              <a href="/" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+          {/* Navigation Links */}
+          <div className="flex items-center gap-6">
+            <nav className="flex items-center gap-4 text-sm">
+              <a href="/" className="text-muted-foreground hover:text-primary transition-colors hover:underline">
                 Home
               </a>
-              <a href="/discover" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+              <span className="text-border">•</span>
+              <a href="/discover" className="text-muted-foreground hover:text-primary transition-colors hover:underline">
                 Discover
               </a>
-              <a href="/settings" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+              <span className="text-border">•</span>
+              <a href="/settings" className="text-muted-foreground hover:text-primary transition-colors hover:underline">
                 Settings
               </a>
-            </div>
+            </nav>
           </div>
 
-          {/* Contact/Support */}
-          <div className="text-center md:text-right">
-            <h4 className="text-sm font-semibold text-foreground mb-4">Support</h4>
-            <div className="space-y-2">
-              <a href="#" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Help Center
-              </a>
-              <a href="#" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Terms of Service
-              </a>
+          {/* Right Section */}
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <span>Made with</span>
+              <Heart className="h-3 w-3 text-red-500 animate-pulse" />
+              <span>for music lovers</span>
+              <Globe className="h-3 w-3 text-accent ml-1" />
             </div>
           </div>
         </div>
 
-        {/* Copyright Section */}
-        <div className="pt-6 border-t border-border/20">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center text-sm text-muted-foreground">
-              <span>© {currentYear} VibeMix Technologies Inc. All rights reserved.</span>
-            </div>
-            
-            <div className="flex items-center text-sm text-muted-foreground">
-              <span>Made with</span>
-              <Heart className="h-4 w-4 text-red-500 mx-1 animate-pulse" />
-              <span>for music lovers worldwide</span>
-            </div>
+        {/* Bottom Bar */}
+        <div className="mt-4 pt-4 border-t border-border/20 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="text-xs text-muted-foreground">
+            © {currentYear} VibeMix Technologies Inc. All rights reserved.
+          </div>
+          <div className="flex items-center gap-4 text-xs">
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              Privacy
+            </a>
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              Terms
+            </a>
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              Help
+            </a>
           </div>
         </div>
       </div>

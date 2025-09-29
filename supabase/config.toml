@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.generate-playlist]
 verify_jwt = false
+
+[functions.store-spotify-tokens]
+verify_jwt = false
+
+[functions.get-spotify-tokens]
+verify_jwt = false

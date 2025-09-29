@@ -56,20 +56,27 @@ export default function AuthCallback() {
         // Get Spotify profile
         const spotifyProfile = await getSpotifyProfile(tokenData.access_token);
 
-        // Store tokens and profile in user preferences
-        const { error: updateError } = await supabase
-          .from('user_preferences')
-          .update({
-            spotify_access_token: tokenData.access_token,
-            spotify_refresh_token: tokenData.refresh_token,
+        // Store tokens securely using edge function
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch('https://yjdwjprbsduenqlcvxyd.supabase.co/functions/v1/store-spotify-tokens', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            access_token: tokenData.access_token,
+            refresh_token: tokenData.refresh_token,
+            expires_in: tokenData.expires_in,
+            scope: tokenData.scope,
             spotify_user_id: spotifyProfile.id,
             spotify_display_name: spotifyProfile.display_name,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', user.id);
+          }),
+        });
 
-        if (updateError) {
-          throw updateError;
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to store Spotify tokens');
         }
 
         toast({

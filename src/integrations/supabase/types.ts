@@ -402,6 +402,42 @@ export type Database = {
           },
         ]
       }
+      spotify_tokens: {
+        Row: {
+          access_token: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          refresh_token: string | null
+          scope: string | null
+          token_type: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          refresh_token?: string | null
+          scope?: string | null
+          token_type?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          refresh_token?: string | null
+          scope?: string | null
+          token_type?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           created_at: string
@@ -469,9 +505,7 @@ export type Database = {
           id: string
           language: string | null
           notifications_enabled: boolean | null
-          spotify_access_token: string | null
           spotify_display_name: string | null
-          spotify_refresh_token: string | null
           spotify_user_id: string | null
           theme: string | null
           updated_at: string
@@ -485,9 +519,7 @@ export type Database = {
           id?: string
           language?: string | null
           notifications_enabled?: boolean | null
-          spotify_access_token?: string | null
           spotify_display_name?: string | null
-          spotify_refresh_token?: string | null
           spotify_user_id?: string | null
           theme?: string | null
           updated_at?: string
@@ -501,9 +533,7 @@ export type Database = {
           id?: string
           language?: string | null
           notifications_enabled?: boolean | null
-          spotify_access_token?: string | null
           spotify_display_name?: string | null
-          spotify_refresh_token?: string | null
           spotify_user_id?: string | null
           theme?: string | null
           updated_at?: string
@@ -516,7 +546,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_spotify_user_info: {
+        Args: { user_id_param?: string }
+        Returns: Json
+      }
+      has_spotify_connection: {
+        Args: { user_id_param?: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

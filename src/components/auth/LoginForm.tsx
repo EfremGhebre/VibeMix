@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { loginSchema, type LoginFormData } from '@/lib/validations';
 
 interface LoginFormProps {
   onSuccess: () => void;
@@ -25,12 +26,23 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const result = await signIn(formData.email, formData.password);
-    
-    if (result.success) {
-      onSuccess();
-    } else {
-      toast.error(result.error || 'Login failed');
+    try {
+      // Validate form data
+      const validatedData = loginSchema.parse(formData);
+      
+      const result = await signIn(validatedData.email, validatedData.password);
+      
+      if (result.success) {
+        onSuccess();
+      } else {
+        toast.error(result.error || 'Login failed');
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Invalid form data');
+      }
     }
     
     setIsSubmitting(false);

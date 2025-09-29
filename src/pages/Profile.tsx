@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import PlaylistList from '@/components/playlist/PlaylistList';
 import { useNavigate } from 'react-router-dom';
+import { profileSchema, type ProfileFormData } from '@/lib/validations';
 
 export default function Profile() {
   const { user, updateProfile, signOut } = useAuth();
@@ -112,7 +113,10 @@ export default function Profile() {
     setIsLoading(true);
     
     try {
-      const result = await updateProfile(profileData);
+      // Validate profile data with Zod
+      const validatedData = profileSchema.parse(profileData);
+      
+      const result = await updateProfile(validatedData);
       console.log('Update result:', result);
       
       if (result.success) {
@@ -127,12 +131,23 @@ export default function Profile() {
         });
       }
     } catch (error) {
-      console.error('Error in handleSave:', error);
-      toast({
-        title: "Error",
-        description: 'Failed to update profile',
-        variant: "destructive",
-      });
+      if (error instanceof Error && 'issues' in error) {
+        // Zod validation error
+        const zodError = error as any;
+        const firstError = zodError.issues[0];
+        toast({
+          title: "Validation Error",
+          description: firstError.message,
+          variant: "destructive",
+        });
+      } else {
+        console.error('Error in handleSave:', error);
+        toast({
+          title: "Error",
+          description: 'Failed to update profile',
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }

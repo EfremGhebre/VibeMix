@@ -7,6 +7,50 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Input validation for Spotify token data
+const validateSpotifyTokenInput = (data: any) => {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid request data format');
+  }
+  
+  const { access_token, refresh_token, expires_in, scope, spotify_user_id, spotify_display_name } = data;
+  
+  // Validate required fields
+  if (!access_token || typeof access_token !== 'string' || access_token.length > 2048) {
+    throw new Error('Invalid or missing access_token');
+  }
+  
+  if (!spotify_user_id || typeof spotify_user_id !== 'string' || spotify_user_id.length > 100) {
+    throw new Error('Invalid or missing spotify_user_id');
+  }
+  
+  // Validate optional fields
+  if (refresh_token && (typeof refresh_token !== 'string' || refresh_token.length > 2048)) {
+    throw new Error('Invalid refresh_token format');
+  }
+  
+  if (expires_in && (typeof expires_in !== 'number' || expires_in < 0 || expires_in > 86400)) {
+    throw new Error('Invalid expires_in value (must be between 0-86400 seconds)');
+  }
+  
+  if (scope && (typeof scope !== 'string' || scope.length > 500)) {
+    throw new Error('Invalid scope format');
+  }
+  
+  if (spotify_display_name && (typeof spotify_display_name !== 'string' || spotify_display_name.length > 100)) {
+    throw new Error('Invalid spotify_display_name format');
+  }
+  
+  return {
+    access_token: access_token.trim(),
+    refresh_token: refresh_token?.trim() || null,
+    expires_in,
+    scope: scope?.trim() || null,
+    spotify_user_id: spotify_user_id.trim(),
+    spotify_display_name: spotify_display_name?.trim() || null
+  };
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -39,6 +83,10 @@ serve(async (req) => {
       throw new Error('Invalid or expired token');
     }
 
+    // Parse and validate request body
+    const requestBody = await req.json();
+    const validatedData = validateSpotifyTokenInput(requestBody);
+    
     const {
       access_token,
       refresh_token,
@@ -46,11 +94,7 @@ serve(async (req) => {
       scope,
       spotify_user_id,
       spotify_display_name
-    } = await req.json();
-
-    if (!access_token || !spotify_user_id) {
-      throw new Error('Missing required Spotify data');
-    }
+    } = validatedData;
 
     // Calculate expiration time
     const expires_at = expires_in 

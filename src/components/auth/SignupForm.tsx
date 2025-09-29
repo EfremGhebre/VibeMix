@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { signupSchema, type SignupFormData } from '@/lib/validations';
 
 interface SignupFormProps {
   onSuccess: () => void;
@@ -29,32 +30,35 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
-      toast.error(t('auth.passwordMismatch'));
-      setIsSubmitting(false);
-      return;
-    }
+    try {
+      // Validate form data with Zod
+      const validatedData = signupSchema.parse(formData);
 
-    if (formData.password.length < 6) {
-      toast.error(t('auth.passwordTooShort'));
-      setIsSubmitting(false);
-      return;
-    }
-
-    const result = await signUp(
-      formData.email,
-      formData.password,
-      {
-        first_name: formData.firstName,
-        last_name: formData.lastName,
+      const result = await signUp(
+        validatedData.email,
+        validatedData.password,
+        {
+          first_name: validatedData.firstName,
+          last_name: validatedData.lastName,
+        }
+      );
+      
+      if (result.success) {
+        onSuccess();
+      } else {
+        toast.error(result.error || 'Sign up failed');
       }
-    );
-    
-    if (result.success) {
-      onSuccess();
-    } else {
-      toast.error(result.error || 'Sign up failed');
+    } catch (error) {
+      if (error instanceof Error && 'issues' in error) {
+        // Zod validation error
+        const zodError = error as any;
+        const firstError = zodError.issues[0];
+        toast.error(firstError.message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Invalid form data');
+      }
     }
     
     setIsSubmitting(false);

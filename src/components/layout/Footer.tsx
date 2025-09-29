@@ -49,13 +49,13 @@ export default function Footer() {
             © {currentYear} VibeMix Technologies Inc. All rights reserved.
           </div>
           <div className="flex items-center gap-4 text-xs">
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
               Privacy
             </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="/terms" className="text-muted-foreground hover:text-primary transition-colors">
               Terms
             </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="/help" className="text-muted-foreground hover:text-primary transition-colors">
               Help
             </a>
           </div>

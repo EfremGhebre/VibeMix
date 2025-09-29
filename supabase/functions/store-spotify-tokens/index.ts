@@ -1,6 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,42 +14,50 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    
-    // Create Supabase client with service role key for secure operations
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
     // Get the authorization header
-    const authHeader = req.headers.get('Authorization');
+    const authHeader = req.headers.get('authorization');
     if (!authHeader) {
       throw new Error('Missing authorization header');
     }
 
-    // Verify the user's JWT token
-    const { data: { user }, error: userError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    // Create Supabase client with service role key for secure operations
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
-    if (userError || !user) {
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
+
+    // Verify the JWT token and get user
+    const jwt = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(jwt);
+    
+    if (authError || !user) {
       throw new Error('Invalid or expired token');
     }
 
-    const { 
-      access_token, 
-      refresh_token, 
+    const {
+      access_token,
+      refresh_token,
       expires_in,
       scope,
       spotify_user_id,
-      spotify_display_name 
+      spotify_display_name
     } = await req.json();
-    
-    if (!access_token) {
-      throw new Error('Missing required parameters');
+
+    if (!access_token || !spotify_user_id) {
+      throw new Error('Missing required Spotify data');
     }
 
     // Calculate expiration time
-    const expires_at = expires_in ? new Date(Date.now() + expires_in * 1000).toISOString() : null;
+    const expires_at = expires_in 
+      ? new Date(Date.now() + expires_in * 1000).toISOString()
+      : null;
 
-    // Securely store tokens in the spotify_tokens table
+    // Store tokens securely in spotify_tokens table
     const { error: tokenError } = await supabase
       .from('spotify_tokens')
       .upsert({
@@ -58,9 +66,7 @@ serve(async (req) => {
         refresh_token,
         expires_at,
         scope,
-        updated_at: new Date().toISOString()
-      }, {
-        onConflict: 'user_id'
+        token_type: 'Bearer'
       });
 
     if (tokenError) {
@@ -68,32 +74,39 @@ serve(async (req) => {
       throw new Error('Failed to store Spotify tokens');
     }
 
-    // Update user preferences with Spotify user info (non-sensitive data only)
+    // Update user preferences with Spotify user info (non-sensitive data)
     const { error: prefsError } = await supabase
       .from('user_preferences')
-      .update({
+      .upsert({
+        user_id: user.id,
         spotify_user_id,
-        spotify_display_name,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_id', user.id);
+        spotify_display_name
+      });
 
     if (prefsError) {
       console.error('Error updating user preferences:', prefsError);
       throw new Error('Failed to update user preferences');
     }
 
-    console.log('Successfully stored Spotify tokens for user:', user.id);
+    console.log(`Successfully stored Spotify tokens for user ${user.id}`);
 
-    return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ success: true }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
+
   } catch (error) {
     console.error('Error in store-spotify-tokens function:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });

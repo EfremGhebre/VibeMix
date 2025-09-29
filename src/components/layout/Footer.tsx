@@ -1,10 +1,7 @@
 import { Heart, Radio, Globe } from 'lucide-react';
-
 export default function Footer() {
   const currentYear = new Date().getFullYear();
-
-  return (
-    <footer className="bg-surface/20 border-t border-border/30 backdrop-blur-md" dir="ltr">
+  return <footer className="bg-surface/20 border-t border-border/30 backdrop-blur-md" dir="ltr">
       <div className="container mx-auto px-4 py-6">
         {/* Main Footer Content */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
@@ -15,9 +12,7 @@ export default function Footer() {
               <span className="text-lg font-bold gradient-text">VibeMix</span>
             </div>
             <div className="hidden sm:block w-px h-8 bg-border/40"></div>
-            <p className="hidden sm:block text-sm text-muted-foreground">
-              Your soundtrack to life
-            </p>
+            <p className="hidden sm:block text-sm text-muted-foreground">Live Loud, Feel Rich </p>
           </div>
 
           {/* Navigation Links */}
@@ -66,6 +61,5 @@ export default function Footer() {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 }

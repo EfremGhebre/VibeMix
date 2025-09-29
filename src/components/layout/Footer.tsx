@@ -38,7 +38,7 @@ export default function Footer() {
               <span>Made with</span>
               <Heart className="h-3 w-3 text-red-500 animate-pulse" />
               <span>for music lovers</span>
-              <Globe className="h-3 w-3 text-accent ml-1" />
+              
             </div>
           </div>
         </div>

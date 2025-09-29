@@ -48,10 +48,7 @@ export default function Header() {
               {t('nav.discover')}
             </Link>
             <Link to="/profile" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
-              My Playlists
-            </Link>
-            <Link to="/profile" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
-              {t('auth.profile')}
+              {t('nav.myPlaylists')}
             </Link>
             <Link to="/settings" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
               {t('nav.settings')}
@@ -204,10 +201,7 @@ export default function Header() {
                         {t('nav.discover')}
                       </Button>
                       <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/profile'); setIsOpen(false); }}>
-                        My Playlists
-                      </Button>
-                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/profile'); setIsOpen(false); }}>
-                        {t('auth.profile')}
+                        {t('nav.myPlaylists')}
                       </Button>
                       <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/settings'); setIsOpen(false); }}>
                         {t('nav.settings')}

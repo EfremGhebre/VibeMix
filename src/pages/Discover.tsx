@@ -127,10 +127,10 @@ export default function Discover() {
           className="text-center mb-12 sm:mb-16"
         >
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold gradient-text mb-4 leading-tight">
-            Create Your Perfect Playlist
+            {t('discover.title')}
           </h1>
           <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-            Tell us your mood, pick your genres, and let VibeMix craft a personalized musical journey just for you.
+            {t('discover.subtitle')}
           </p>
         </motion.div>
 
@@ -159,14 +159,14 @@ export default function Discover() {
               {isGenerating ? (
                 <>
                   <Music2 className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
-                  <span className="hidden sm:inline">Creating your vibe...</span>
-                  <span className="sm:hidden">Creating...</span>
+                  <span className="hidden sm:inline">{t('discover.creatingVibe')}</span>
+                  <span className="sm:hidden">{t('discover.creating')}</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 group-hover:animate-bounce" />
                   <span className="hidden sm:inline">{t('button.generatePlaylist')}</span>
-                  <span className="sm:hidden">Generate</span>
+                  <span className="sm:hidden">{t('discover.generate')}</span>
                 </>
               )}
             </Button>
@@ -177,8 +177,8 @@ export default function Discover() {
                 animate={{ opacity: 1 }}
                 className="text-xs sm:text-sm text-muted-foreground mt-4 px-4 leading-relaxed"
               >
-                Ready to generate a <span className="text-primary font-medium">{selectedMood}</span> playlist with{' '}
-                <span className="text-secondary font-medium">{selectedGenres.join(', ')}</span> music
+                {t('discover.readyGenerate')} <span className="text-primary font-medium">{selectedMood}</span> {t('discover.playlistWith')}{' '}
+                <span className="text-secondary font-medium">{selectedGenres.join(', ')}</span> {t('discover.music')}
               </motion.p>
             )}
           </motion.div>

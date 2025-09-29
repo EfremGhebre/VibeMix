@@ -60,7 +60,7 @@ const Index = () => {
           >
             <Button onClick={handleGetStarted} className="hero-button text-base sm:text-lg group h-12 sm:h-14 px-6 sm:px-8">
               <Headphones className="mr-2 sm:mr-3 h-5 w-5 group-hover:animate-bounce" />
-              Start Your Musical Journey
+              {t('hero.startJourney')}
               <ArrowRight className="ml-2 sm:ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </motion.div>
@@ -77,9 +77,9 @@ const Index = () => {
                 <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
                   <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold mb-3">Instant Playlist Creation</h3>
+                <h3 className="text-lg sm:text-xl font-semibold mb-3">{t('features.instantPlaylist')}</h3>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Generate perfectly curated playlists in seconds. Just pick your mood, select genres, and let our AI do the magic.
+                  {t('features.instantPlaylistDesc')}
                 </p>
               </div>
 
@@ -87,30 +87,30 @@ const Index = () => {
                 <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl bg-secondary/10 flex items-center justify-center">
                   <Globe className="h-6 w-6 sm:h-8 sm:w-8 text-secondary" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold mb-3">Global Music Discovery</h3>
+                <h3 className="text-lg sm:text-xl font-semibold mb-3">{t('features.globalMusic')}</h3>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Explore music from around the world in multiple languages. Discover your next favorite artist from any culture.
+                  {t('features.globalMusicDesc')}
                 </p>
               </div>
             </div>
 
             <div className="text-center max-w-2xl mx-auto px-4">
               <p className="text-base sm:text-lg text-muted-foreground mb-6 sm:mb-8 leading-relaxed">
-                Join thousands of music lovers who have already discovered their perfect soundtracks. 
-                <span className="text-primary font-medium"> Start your musical journey today!</span>
+                {t('features.joinThousands')}{' '}
+                <span className="text-primary font-medium">{t('features.startToday')}</span>
               </p>
               
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                 <Button onClick={handleGetStarted} size="lg" className="text-sm sm:text-base h-12 sm:h-14">
                   <Headphones className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  Explore Music
+                  {t('hero.exploreMusic')}
                 </Button>
                 <Button variant="outline" size="lg" className="text-sm sm:text-base h-12 sm:h-14" onClick={() => {
                   const element = document.getElementById('music-discovery');
                   element?.scrollIntoView({ behavior: 'smooth' });
                 }}>
                   <Stars className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  Try Interactive Demo
+                  {t('hero.tryDemo')}
                 </Button>
                 <SpotifyConnectButton variant="secondary" size="lg" className="text-sm sm:text-base h-12 sm:h-14" />
               </div>
@@ -127,9 +127,9 @@ const Index = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-6">Experience VibeMix</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-6">{t('experience.title')}</h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Get a taste of what VibeMix can do. Explore trending genres or preview our curated music selection.
+            {t('experience.subtitle')}
           </p>
           <MusicDiscoveryWidget />
         </motion.div>
@@ -143,9 +143,9 @@ const Index = () => {
           transition={{ duration: 0.8, delay: 0.8 }}
           className="text-center max-w-4xl mx-auto mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-6">How It Works</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-6">{t('howItWorks.title')}</h2>
           <p className="text-lg text-muted-foreground mb-12">
-            Creating your perfect playlist is just four simple steps away
+            {t('howItWorks.subtitle')}
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
@@ -153,9 +153,9 @@ const Index = () => {
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/10 flex items-center justify-center text-2xl font-bold text-green-500">
                 1
               </div>
-              <h3 className="text-xl font-semibold mb-3">Connect Spotify</h3>
+              <h3 className="text-xl font-semibold mb-3">{t('howItWorks.step1')}</h3>
               <p className="text-muted-foreground">
-                Link your Spotify account to access millions of songs and save your generated playlists directly to your music library.
+                {t('howItWorks.step1Desc')}
               </p>
             </div>
             
@@ -163,9 +163,9 @@ const Index = () => {
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
                 2
               </div>
-              <h3 className="text-xl font-semibold mb-3">Choose Your Mood</h3>
+              <h3 className="text-xl font-semibold mb-3">{t('howItWorks.step2')}</h3>
               <p className="text-muted-foreground">
-                Select from various moods like Happy, Chill, Energetic, or Romantic. Our AI understands the emotional context you're looking for.
+                {t('howItWorks.step2Desc')}
               </p>
             </div>
             
@@ -173,9 +173,9 @@ const Index = () => {
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary/10 flex items-center justify-center text-2xl font-bold text-secondary">
                 3
               </div>
-              <h3 className="text-xl font-semibold mb-3">Pick Genres & Language</h3>
+              <h3 className="text-xl font-semibold mb-3">{t('howItWorks.step3')}</h3>
               <p className="text-muted-foreground">
-                Customize your playlist by selecting genres you love and choose from multiple languages to discover global music.
+                {t('howItWorks.step3Desc')}
               </p>
             </div>
             
@@ -183,9 +183,9 @@ const Index = () => {
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/10 flex items-center justify-center text-2xl font-bold text-accent">
                 4
               </div>
-              <h3 className="text-xl font-semibold mb-3">Get Your Playlist</h3>
+              <h3 className="text-xl font-semibold mb-3">{t('howItWorks.step4')}</h3>
               <p className="text-muted-foreground">
-                Our intelligent algorithm instantly creates a personalized playlist that perfectly matches your mood and preferences.
+                {t('howItWorks.step4Desc')}
               </p>
             </div>
           </div>
@@ -204,24 +204,24 @@ const Index = () => {
             <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center">
               <Target className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             </div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">Mood-Based</h3>
-            <p className="text-sm sm:text-base text-muted-foreground">Select your current mood and let our algorithm find the perfect tracks that match your energy.</p>
+            <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('features.moodBased')}</h3>
+            <p className="text-sm sm:text-base text-muted-foreground">{t('features.moodBasedDesc')}</p>
           </div>
 
           <div className="text-center p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40 hover:border-secondary/30 transition-colors">
             <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 rounded-xl bg-secondary/10 flex items-center justify-center">
               <Palette className="h-5 w-5 sm:h-6 sm:w-6 text-secondary" />
             </div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">Multi-Genre</h3>
-            <p className="text-sm sm:text-base text-muted-foreground">Mix and match from multiple genres to create unique playlists that reflect your diverse taste.</p>
+            <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('features.multiGenre')}</h3>
+            <p className="text-sm sm:text-base text-muted-foreground">{t('features.multiGenreDesc')}</p>
           </div>
 
           <div className="text-center p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40 hover:border-accent/30 transition-colors">
             <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 rounded-xl bg-accent/10 flex items-center justify-center">
               <Globe className="h-5 w-5 sm:h-6 sm:w-6 text-accent" />
             </div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">Multi-Language</h3>
-            <p className="text-sm sm:text-base text-muted-foreground">Discover music in multiple languages and expand your musical horizons across cultures.</p>
+            <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('features.multiLanguage')}</h3>
+            <p className="text-sm sm:text-base text-muted-foreground">{t('features.multiLanguageDesc')}</p>
           </div>
         </motion.div>
       </section>

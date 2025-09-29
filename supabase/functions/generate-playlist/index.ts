@@ -10,6 +10,47 @@ const corsHeaders = {
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
+// Input validation schema
+function validateGeneratePlaylistInput(data: any) {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Request body must be an object');
+  }
+
+  const { mood, genres, languages, userId } = data;
+
+  if (!mood || typeof mood !== 'string' || mood.trim().length === 0) {
+    throw new Error('Mood is required and must be a non-empty string');
+  }
+
+  if (!Array.isArray(genres) || genres.length === 0) {
+    throw new Error('Genres must be a non-empty array');
+  }
+
+  if (!Array.isArray(languages) || languages.length === 0) {
+    throw new Error('Languages must be a non-empty array');
+  }
+
+  if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
+    throw new Error('User ID is required and must be a non-empty string');
+  }
+
+  // Validate each genre
+  for (const genre of genres) {
+    if (typeof genre !== 'string' || genre.trim().length === 0) {
+      throw new Error('All genres must be non-empty strings');
+    }
+  }
+
+  // Validate each language
+  for (const language of languages) {
+    if (typeof language !== 'string' || language.trim().length === 0) {
+      throw new Error('All languages must be non-empty strings');
+    }
+  }
+
+  return { mood: mood.trim(), genres, languages, userId: userId.trim() };
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -17,24 +58,38 @@ serve(async (req) => {
   }
 
   try {
-    const { mood, genres, languages, userId } = await req.json();
+    // Parse and validate input
+    const requestData = await req.json();
+    const { mood, genres, languages, userId } = validateGeneratePlaylistInput(requestData);
     
     console.log('Generating playlist for:', { mood, genres, languages, userId });
 
     // Create Supabase client
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get user's Spotify tokens
-    const { data: userPrefs, error: prefsError } = await supabase
-      .from('user_preferences')
-      .select('spotify_access_token, spotify_refresh_token')
-      .eq('user_id', userId)
-      .maybeSingle();
-
-    if (prefsError) {
-      console.error('Error fetching user preferences:', prefsError);
+    // Get JWT token from Authorization header for secure token retrieval
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return new Response(
-        JSON.stringify({ error: 'Failed to fetch user preferences. Please try again.' }), 
+        JSON.stringify({ error: 'Authentication required. Please log in.' }), 
+        { 
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Get Spotify tokens securely using the get-spotify-tokens function
+    const { data: tokenData, error: tokenError } = await supabase.functions.invoke('get-spotify-tokens', {
+      headers: {
+        Authorization: authHeader,
+      },
+    });
+
+    if (tokenError) {
+      console.error('Error fetching Spotify tokens:', tokenError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to retrieve Spotify tokens. Please reconnect your Spotify account.' }), 
         { 
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -42,8 +97,8 @@ serve(async (req) => {
       );
     }
 
-    if (!userPrefs || !userPrefs.spotify_access_token) {
-      console.error('No Spotify access token found:', userPrefs?.spotify_access_token || 'No user preferences record');
+    if (!tokenData || !tokenData.access_token) {
+      console.error('No Spotify access token found in response:', tokenData);
       return new Response(
         JSON.stringify({ error: 'Spotify not connected. Please connect your Spotify account first.' }), 
         { 
@@ -63,7 +118,7 @@ serve(async (req) => {
     // Search for tracks on Spotify
     const spotifyResponse = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(searchQuery)}&type=track&limit=30&market=US`, {
       headers: {
-        'Authorization': `Bearer ${userPrefs.spotify_access_token}`,
+        'Authorization': `Bearer ${tokenData.access_token}`,
         'Content-Type': 'application/json',
       },
     });

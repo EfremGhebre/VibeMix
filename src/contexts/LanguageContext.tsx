@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 export type Language = 'en' | 'ar' | 'sv';
 
@@ -267,11 +267,35 @@ const translations = {
   }
 };
 
+// Helper function to get initial language
+const getInitialLanguage = (): Language => {
+  // Try to get saved language from localStorage
+  const savedLanguage = localStorage.getItem('vibemix-language') as Language;
+  if (savedLanguage && ['en', 'ar', 'sv'].includes(savedLanguage)) {
+    return savedLanguage;
+  }
+
+  // Fallback to browser language if supported
+  const browserLanguage = navigator.language.toLowerCase();
+  if (browserLanguage.startsWith('ar')) return 'ar';
+  if (browserLanguage.startsWith('sv')) return 'sv';
+  
+  // Default to English
+  return 'en';
+};
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(getInitialLanguage);
+
+  // Initialize document attributes on mount
+  useEffect(() => {
+    document.documentElement.lang = currentLanguage;
+    document.documentElement.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+  }, [currentLanguage]);
 
   const changeLanguage = useCallback((lang: Language) => {
     setCurrentLanguage(lang);
+    localStorage.setItem('vibemix-language', lang);
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }, []);

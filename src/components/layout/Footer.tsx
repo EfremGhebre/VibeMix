@@ -1,20 +1,17 @@
-import { Heart, Music, Globe } from 'lucide-react';
+import { Heart, Radio, Globe } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-surface/20 border-t border-border/30 backdrop-blur-md">
+    <footer className="bg-surface/20 border-t border-border/30 backdrop-blur-md" dir="ltr">
       <div className="container mx-auto px-4 py-6">
         {/* Main Footer Content */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Brand Section */}
           <div className="flex items-center gap-6">
             <div className="flex items-center">
-              <div className="relative">
-                <Music className="h-5 w-5 text-primary mr-2" />
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-accent rounded-full animate-pulse"></div>
-              </div>
+              <Radio className="h-5 w-5 text-primary animate-pulse-glow mr-2" />
               <span className="text-lg font-bold gradient-text">VibeMix</span>
             </div>
             <div className="hidden sm:block w-px h-8 bg-border/40"></div>

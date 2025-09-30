@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { User, Mail } from 'lucide-react';
+import { User, Mail, Music } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -209,24 +210,183 @@ export default function Profile() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        {/* Playlists */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Playlists</CardTitle>
-              <CardDescription>
-                Discover and manage your personalized music collections
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <PlaylistList limit={6} showCreateButton={true} />
-            </CardContent>
-          </Card>
-        </motion.div>
+        <Tabs defaultValue="profile" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="playlists" className="flex items-center gap-2">
+              <Music className="h-4 w-4" />
+              My Playlists
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Profile Tab */}
+          <TabsContent value="profile" className="space-y-6">
+            {/* Profile Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card>
+                <CardHeader className="text-center">
+                  <div className="flex justify-center mb-4">
+                    <Avatar className="h-24 w-24">
+                      <AvatarImage src={user.user_metadata?.avatar_url} alt={user.email} />
+                      <AvatarFallback className="text-2xl">
+                        {getInitials(user.email || 'User')}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <CardTitle className="text-2xl">
+                    {profileData.first_name && profileData.last_name 
+                      ? `${profileData.first_name} ${profileData.last_name}`
+                      : profileData.first_name || user.email?.split('@')[0]}
+                  </CardTitle>
+                  <CardDescription className="text-lg">
+                    {user.email}
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </motion.div>
+
+            {/* Profile Details */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Profile Information</CardTitle>
+                    <Button
+                      variant={isEditing ? "outline" : "default"}
+                      onClick={() => setIsEditing(!isEditing)}
+                    >
+                      {isEditing ? 'Cancel' : 'Edit Profile'}
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="first_name">First Name</Label>
+                      <Input
+                        id="first_name"
+                        name="first_name"
+                        value={profileData.first_name}
+                        onChange={handleInputChange}
+                        disabled={!isEditing}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="last_name">Last Name</Label>
+                      <Input
+                        id="last_name"
+                        name="last_name"
+                        value={profileData.last_name}
+                        onChange={handleInputChange}
+                        disabled={!isEditing}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      value={user.email}
+                      disabled
+                      className="bg-muted"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="bio">Bio</Label>
+                    <Textarea
+                      id="bio"
+                      name="bio"
+                      value={profileData.bio}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      placeholder="Tell us about yourself..."
+                      rows={3}
+                    />
+                  </div>
+
+                  {isEditing && (
+                    <div className="flex space-x-2 pt-4">
+                      <Button
+                        onClick={handleSave}
+                        disabled={isLoading}
+                        className="flex-1"
+                      >
+                        {isLoading ? 'Saving...' : 'Save Changes'}
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Account Actions */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>Account Actions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => navigate('/settings')}
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      Account Settings
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-destructive hover:text-destructive"
+                      onClick={signOut}
+                    >
+                      <Mail className="mr-2 h-4 w-4" />
+                      Sign Out
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+
+          {/* My Playlists Tab */}
+          <TabsContent value="playlists">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>Your Playlists</CardTitle>
+                  <CardDescription>
+                    Discover and manage your personalized music collections
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PlaylistList limit={6} showCreateButton={true} />
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

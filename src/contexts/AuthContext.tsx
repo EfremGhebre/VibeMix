@@ -71,15 +71,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const createUserProfile = async (user: User) => {
     try {
+      // Use upsert to avoid duplicate key errors
+      // This will insert if the profile doesn't exist, or do nothing if it does
       const { error } = await supabase
         .from('profiles')
-        .insert({
+        .upsert({
           user_id: user.id,
           first_name: user.user_metadata?.first_name || user.email?.split('@')[0],
           last_name: user.user_metadata?.last_name || '',
+        }, {
+          onConflict: 'user_id',
+          ignoreDuplicates: true
         });
 
-      if (error) {
+      // Only log unexpected errors (not duplicate key conflicts)
+      if (error && error.code !== '23505') {
         console.error('Error creating user profile:', error);
       }
     } catch (error) {

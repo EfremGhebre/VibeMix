@@ -15,10 +15,13 @@ export function SpotifyConnectButton({
   size = "default",
   className = ""
 }: SpotifyConnectButtonProps) {
-  const { user } = useAuth();
+  const { user, session, loading } = useAuth();
 
   const handleConnect = () => {
-    if (!user) {
+    // Check both user and session for more reliable authentication state
+    const isAuthenticated = !!(user && session);
+    
+    if (!isAuthenticated) {
       toast({
         title: "Login Required",
         description: "Please log in first before connecting to Spotify",
@@ -37,9 +40,10 @@ export function SpotifyConnectButton({
       variant={variant}
       size={size}
       className={className}
+      disabled={loading}
     >
       <Music className="w-4 h-4 mr-2" />
-      Connect Spotify
+      {loading ? "Loading..." : "Connect Spotify"}
     </Button>
   );
 }

@@ -47,7 +47,7 @@ export default function Header() {
             <Link to="/discover" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
               {t('nav.discover')}
             </Link>
-            <Link to="/profile" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
+            <Link to="/playlists" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
               {t('nav.myPlaylists')}
             </Link>
             <Link to="/settings" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
@@ -200,7 +200,7 @@ export default function Header() {
                       <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/discover'); setIsOpen(false); }}>
                         {t('nav.discover')}
                       </Button>
-                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/profile'); setIsOpen(false); }}>
+                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/playlists'); setIsOpen(false); }}>
                         {t('nav.myPlaylists')}
                       </Button>
                       <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/settings'); setIsOpen(false); }}>

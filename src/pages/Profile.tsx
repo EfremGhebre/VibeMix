@@ -5,14 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { User, Mail, Music } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import PlaylistList from '@/components/playlist/PlaylistList';
 import { useNavigate } from 'react-router-dom';
 import { profileSchema, type ProfileFormData } from '@/lib/validations';
 
@@ -210,20 +208,8 @@ export default function Profile() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="profile" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Profile
-            </TabsTrigger>
-            <TabsTrigger value="playlists" className="flex items-center gap-2">
-              <Music className="h-4 w-4" />
-              My Playlists
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Profile Tab */}
-          <TabsContent value="profile" className="space-y-6">
+        <div className="space-y-6">
+          {/* Profile Header */}
             {/* Profile Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -331,62 +317,39 @@ export default function Profile() {
                 </CardContent>
               </Card>
             </motion.div>
-
-            {/* Account Actions */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Account Actions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={() => navigate('/settings')}
-                    >
-                      <User className="mr-2 h-4 w-4" />
-                      Account Settings
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-destructive hover:text-destructive"
-                      onClick={signOut}
-                    >
-                      <Mail className="mr-2 h-4 w-4" />
-                      Sign Out
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-
-          {/* My Playlists Tab */}
-          <TabsContent value="playlists">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Playlists</CardTitle>
-                  <CardDescription>
-                    Discover and manage your personalized music collections
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <PlaylistList limit={6} showCreateButton={true} />
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-        </Tabs>
+          {/* Account Actions */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle>Account Actions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => navigate('/settings')}
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Account Settings
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-destructive hover:text-destructive"
+                    onClick={signOut}
+                  >
+                    <Mail className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </div>
     </div>
   );

@@ -10,9 +10,10 @@ import { signupSchema, type SignupFormData } from '@/lib/validations';
 
 interface SignupFormProps {
   onSuccess: () => void;
+  onSwitchToLogin?: () => void;
 }
 
-export default function SignupForm({ onSuccess }: SignupFormProps) {
+export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
   const { signUp, loading } = useAuth();
   const { t } = useLanguage();
   const [formData, setFormData] = useState({
@@ -191,6 +192,24 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
           t('auth.signup')
         )}
       </Button>
+
+      {/* Sign In option for registered users */}
+      {onSwitchToLogin && (
+        <div className="mt-4 text-center">
+          <p className="text-sm text-muted-foreground mb-2">
+            Already have an account?
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={onSwitchToLogin}
+            disabled={isSubmitting}
+          >
+            {t('auth.login')}
+          </Button>
+        </div>
+      )}
     </form>
   );
 }

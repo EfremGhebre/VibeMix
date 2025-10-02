@@ -87,32 +87,18 @@ export default function Header() {
           {user ? (
             <UserMenu />
           ) : (
-            <div className={`flex items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-sm hover:text-primary transition-colors"
-                onClick={() => {
-                  setAuthModalTab('login');
-                  setAuthModalOpen(true);
-                }}
-              >
-                <LogIn className="mr-2 h-4 w-4" />
-                {t('auth.login')}
-              </Button>
-              <Button 
-                variant="default" 
-                size="sm" 
-                className="text-sm hover:text-primary transition-colors"
-                onClick={() => {
-                  setAuthModalTab('signup');
-                  setAuthModalOpen(true);
-                }}
-              >
-                <UserPlus className="mr-2 h-4 w-4" />
-                {t('auth.signup')}
-              </Button>
-            </div>
+            <Button 
+              variant="default" 
+              size="sm" 
+              className="text-sm hover:text-primary transition-colors"
+              onClick={() => {
+                setAuthModalTab('signup');
+                setAuthModalOpen(true);
+              }}
+            >
+              <UserPlus className="mr-2 h-4 w-4" />
+              Get Started
+            </Button>
           )}
 
           {/* Language Selector */}
@@ -290,34 +276,19 @@ export default function Header() {
                       </Button>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 gap-3">
-                      <Button 
-                        variant="outline" 
-                        size="lg" 
-                        className="h-12"
-                        onClick={() => {
-                          setAuthModalTab('login');
-                          setAuthModalOpen(true);
-                          setIsOpen(false);
-                        }}
-                      >
-                        <LogIn className="mr-2 h-4 w-4" />
-                        {t('auth.login')}
-                      </Button>
-                      <Button 
-                        variant="default" 
-                        size="lg" 
-                        className="h-12"
-                        onClick={() => {
-                          setAuthModalTab('signup');
-                          setAuthModalOpen(true);
-                          setIsOpen(false);
-                        }}
-                      >
-                        <UserPlus className="mr-2 h-4 w-4" />
-                        {t('auth.signup')}
-                      </Button>
-                    </div>
+                    <Button 
+                      variant="default" 
+                      size="lg" 
+                      className="h-12 w-full"
+                      onClick={() => {
+                        setAuthModalTab('signup');
+                        setAuthModalOpen(true);
+                        setIsOpen(false);
+                      }}
+                    >
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Get Started
+                    </Button>
                   )}
                 </div>
               </div>

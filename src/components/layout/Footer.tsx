@@ -1,4 +1,5 @@
 import { Heart, Radio, Globe } from 'lucide-react';
+import { Link } from 'react-router-dom';
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   return <footer className="bg-surface/20 border-t border-border/30 backdrop-blur-md" dir="ltr">
@@ -15,22 +16,6 @@ export default function Footer() {
             <p className="hidden sm:block text-sm text-muted-foreground">Live Loud, Feel Rich </p>
           </div>
 
-          {/* Navigation Links */}
-          <div className="flex items-center gap-6">
-            <nav className="flex items-center gap-4 text-sm">
-              <a href="/" className="text-muted-foreground hover:text-primary transition-colors hover:underline">
-                Home
-              </a>
-              <span className="text-border">•</span>
-              <a href="/discover" className="text-muted-foreground hover:text-primary transition-colors hover:underline">
-                Discover
-              </a>
-              <span className="text-border">•</span>
-              <a href="/settings" className="text-muted-foreground hover:text-primary transition-colors hover:underline">
-                Settings
-              </a>
-            </nav>
-          </div>
 
           {/* Right Section */}
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -49,15 +34,15 @@ export default function Footer() {
             © {currentYear} VibeMix Technologies Inc. All rights reserved.
           </div>
           <div className="flex items-center gap-4 text-xs">
-            <a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
+            <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
               Privacy
-            </a>
-            <a href="/terms" className="text-muted-foreground hover:text-primary transition-colors">
+            </Link>
+            <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors">
               Terms
-            </a>
-            <a href="/help" className="text-muted-foreground hover:text-primary transition-colors">
+            </Link>
+            <Link to="/help" className="text-muted-foreground hover:text-primary transition-colors">
               Help
-            </a>
+            </Link>
           </div>
         </div>
       </div>

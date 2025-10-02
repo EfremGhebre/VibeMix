@@ -10,8 +10,11 @@ export function AuthWrapper({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Smooth navigation on auth state changes
     if (!user && !session) {
-      // If user is signed out and not on home page, navigate smoothly
-      if (location.pathname !== '/') {
+      // Define public routes that don't require authentication
+      const publicRoutes = ['/', '/privacy', '/terms', '/help'];
+      
+      // If user is signed out and not on a public page, navigate smoothly
+      if (!publicRoutes.includes(location.pathname)) {
         navigate('/', { replace: true });
       }
     }

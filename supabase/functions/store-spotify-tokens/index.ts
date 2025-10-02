@@ -57,6 +57,10 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let userId: string | null = null;
+  const ipAddress = req.headers.get('x-forwarded-for') || 'unknown';
+  const userAgent = req.headers.get('user-agent') || 'unknown';
+
   try {
     // Get the authorization header
     const authHeader = req.headers.get('authorization');
@@ -80,8 +84,19 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(jwt);
     
     if (authError || !user) {
-      throw new Error('Invalid or expired token');
+      // Log failed authentication attempt
+      await supabase.from('spotify_token_audit_log').insert({
+        user_id: userId || '00000000-0000-0000-0000-000000000000',
+        action: 'store_tokens_failed_auth',
+        ip_address: ipAddress,
+        user_agent: userAgent,
+        success: false,
+        error_message: 'Authentication failed'
+      });
+      throw new Error('Authentication failed');
     }
+
+    userId = user.id;
 
     // Parse and validate request body
     const requestBody = await req.json();
@@ -134,6 +149,15 @@ serve(async (req) => {
 
     console.log(`Successfully stored Spotify tokens for user ${user.id}`);
 
+    // Log successful token storage
+    await supabase.from('spotify_token_audit_log').insert({
+      user_id: userId,
+      action: 'tokens_stored',
+      ip_address: ipAddress,
+      user_agent: userAgent,
+      success: true
+    });
+
     return new Response(
       JSON.stringify({ success: true }),
       {
@@ -143,10 +167,31 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in store-spotify-tokens function:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     
+    // Log the error
+    if (userId) {
+      try {
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+        
+        await supabase.from('spotify_token_audit_log').insert({
+          user_id: userId,
+          action: 'store_tokens_error',
+          ip_address: ipAddress,
+          user_agent: userAgent,
+          success: false,
+          error_message: errorMessage
+        });
+      } catch (logError) {
+        console.error('Failed to log error:', logError);
+      }
+    }
+    
+    // Return generic error message to avoid information leakage
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: 'An error occurred while storing tokens' }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

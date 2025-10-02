@@ -13,6 +13,10 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let userId: string | null = null;
+  const ipAddress = req.headers.get('x-forwarded-for') || 'unknown';
+  const userAgent = req.headers.get('user-agent') || 'unknown';
+
   try {
     // Get the authorization header
     const authHeader = req.headers.get('authorization');
@@ -36,8 +40,28 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(jwt);
     
     if (authError || !user) {
-      throw new Error('Invalid or expired token');
+      // Log failed authentication attempt
+      await supabase.from('spotify_token_audit_log').insert({
+        user_id: userId || '00000000-0000-0000-0000-000000000000',
+        action: 'get_tokens_failed_auth',
+        ip_address: ipAddress,
+        user_agent: userAgent,
+        success: false,
+        error_message: 'Authentication failed'
+      });
+      throw new Error('Authentication failed');
     }
+
+    userId = user.id;
+
+    // Log token access attempt
+    await supabase.from('spotify_token_audit_log').insert({
+      user_id: userId,
+      action: 'get_tokens_attempt',
+      ip_address: ipAddress,
+      user_agent: userAgent,
+      success: true
+    });
 
     // Get Spotify tokens for the authenticated user
     const { data: tokenData, error: tokenError } = await supabase
@@ -48,7 +72,16 @@ serve(async (req) => {
 
     if (tokenError) {
       if (tokenError.code === 'PGRST116') {
-        // No tokens found
+        // No tokens found - log this
+        await supabase.from('spotify_token_audit_log').insert({
+          user_id: userId,
+          action: 'get_tokens_not_found',
+          ip_address: ipAddress,
+          user_agent: userAgent,
+          success: false,
+          error_message: 'No Spotify connection found'
+        });
+        
         return new Response(
           JSON.stringify({ error: 'No Spotify connection found' }),
           {
@@ -58,7 +91,17 @@ serve(async (req) => {
         );
       }
       console.error('Error retrieving Spotify tokens:', tokenError);
-      throw new Error('Failed to retrieve Spotify tokens');
+      
+      await supabase.from('spotify_token_audit_log').insert({
+        user_id: userId,
+        action: 'get_tokens_db_error',
+        ip_address: ipAddress,
+        user_agent: userAgent,
+        success: false,
+        error_message: 'Database error'
+      });
+      
+      throw new Error('Failed to retrieve tokens');
     }
 
     // Check if token is expired
@@ -110,6 +153,15 @@ serve(async (req) => {
 
       console.log(`Successfully refreshed Spotify tokens for user ${user.id}`);
       
+      // Log successful token refresh
+      await supabase.from('spotify_token_audit_log').insert({
+        user_id: userId,
+        action: 'token_refreshed',
+        ip_address: ipAddress,
+        user_agent: userAgent,
+        success: true
+      });
+      
       return new Response(
         JSON.stringify({
           access_token: newTokenData.access_token,
@@ -120,6 +172,15 @@ serve(async (req) => {
         }
       );
     }
+
+    // Log successful token retrieval
+    await supabase.from('spotify_token_audit_log').insert({
+      user_id: userId,
+      action: 'tokens_retrieved',
+      ip_address: ipAddress,
+      user_agent: userAgent,
+      success: true
+    });
 
     // Return existing valid token
     return new Response(
@@ -134,10 +195,31 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in get-spotify-tokens function:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     
+    // Log the error (with safe error message)
+    if (userId) {
+      try {
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+        
+        await supabase.from('spotify_token_audit_log').insert({
+          user_id: userId,
+          action: 'get_tokens_error',
+          ip_address: ipAddress,
+          user_agent: userAgent,
+          success: false,
+          error_message: errorMessage
+        });
+      } catch (logError) {
+        console.error('Failed to log error:', logError);
+      }
+    }
+    
+    // Return generic error message to avoid information leakage
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: 'An error occurred while retrieving tokens' }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -2,8 +2,11 @@ import { motion } from 'framer-motion';
 import { HelpCircle, MessageSquare, Book, Mail, Phone, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
+import Chatbot, { ChatbotToggle } from '@/components/chat/Chatbot';
 
 export default function Help() {
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const faqItems = [
     {
       question: "How do I connect my Spotify account?",
@@ -50,7 +53,12 @@ export default function Help() {
                 <CardDescription>Get instant help from our support team</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">Start Chat</Button>
+                <Button 
+                  className="w-full" 
+                  onClick={() => setIsChatbotOpen(true)}
+                >
+                  Start Chat
+                </Button>
               </CardContent>
             </Card>
 
@@ -126,6 +134,18 @@ export default function Help() {
           </div>
         </motion.div>
       </div>
+      
+      {/* Chatbot Components */}
+      <Chatbot 
+        isOpen={isChatbotOpen} 
+        onToggle={() => setIsChatbotOpen(!isChatbotOpen)} 
+      />
+      {!isChatbotOpen && (
+        <ChatbotToggle 
+          isOpen={isChatbotOpen} 
+          onToggle={() => setIsChatbotOpen(!isChatbotOpen)} 
+        />
+      )}
     </div>
   );
 }

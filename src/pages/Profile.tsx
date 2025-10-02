@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { User, Mail, Music } from 'lucide-react';
+import { User, Mail, Music, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -342,7 +342,7 @@ export default function Profile() {
                     className="w-full justify-start text-destructive hover:text-destructive"
                     onClick={signOut}
                   >
-                    <Mail className="mr-2 h-4 w-4" />
+                    <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
                   </Button>
                 </div>

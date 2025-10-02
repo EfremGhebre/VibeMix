@@ -1,13 +1,13 @@
 project_id = "yjdwjprbsduenqlcvxyd"
 
 [functions.spotify-token]
-verify_jwt = false
+verify_jwt = true
 
 [functions.generate-playlist]
-verify_jwt = false
+verify_jwt = true
 
 [functions.store-spotify-tokens]
-verify_jwt = false
+verify_jwt = true
 
 [functions.get-spotify-tokens]
-verify_jwt = false
+verify_jwt = true

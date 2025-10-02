@@ -267,6 +267,27 @@ export default function Header() {
                           <p className="text-xs text-muted-foreground">{user.email}</p>
                         </div>
                       </button>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-destructive hover:text-destructive"
+                        onClick={() => {
+                          signOut();
+                          setIsOpen(false);
+                        }}
+                        disabled={signingOut}
+                      >
+                        {signingOut ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-destructive mr-2"></div>
+                            Signing out...
+                          </>
+                        ) : (
+                          <>
+                            <LogOut className="mr-2 h-4 w-4" />
+                            {t('auth.signOut')}
+                          </>
+                        )}
+                      </Button>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 gap-3">

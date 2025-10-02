@@ -1,4 +1,4 @@
-const SPOTIFY_CLIENT_ID = '658f820398dc48138cebe0706fc8fb0a';
+const SPOTIFY_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = `${window.location.protocol}//${window.location.host}/auth/callback`;
 const SCOPES = [
   'user-read-private',
@@ -33,11 +33,12 @@ export const getSpotifyAuthUrl = () => {
   return authUrl;
 };
 
-export const getAccessTokenFromCode = async (code: string) => {
+export const getAccessTokenFromCode = async (code: string, authToken: string) => {
   const response = await fetch('https://yjdwjprbsduenqlcvxyd.supabase.co/functions/v1/spotify-token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`,
     },
     body: JSON.stringify({ code, redirect_uri: REDIRECT_URI }),
   });

@@ -13,7 +13,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
 import UserMenu from '@/components/auth/UserMenu';
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 const languages: { code: Language; name: string; flag: string }[] = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -29,6 +30,23 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState<'login' | 'signup'>('login');
+  const [profileData, setProfileData] = useState<{ first_name?: string; last_name?: string } | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (data) setProfileData(data);
+    };
+
+    fetchProfile();
+  }, [user]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -218,11 +236,15 @@ export default function Header() {
                       <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
                         <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                           <span className="text-sm font-medium">
-                            {user.email?.charAt(0).toUpperCase()}
+                            {profileData?.first_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div>
-                          <p className="text-sm font-medium">{user.user_metadata?.display_name || user.email?.split('@')[0]}</p>
+                          <p className="text-sm font-medium">
+                            {profileData?.first_name && profileData?.last_name 
+                              ? `${profileData.first_name} ${profileData.last_name}`
+                              : user.email?.split('@')[0]}
+                          </p>
                           <p className="text-xs text-muted-foreground">{user.email}</p>
                         </div>
                       </div>

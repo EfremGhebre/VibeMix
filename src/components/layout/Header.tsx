@@ -7,6 +7,13 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { useLanguage, type Language } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -189,22 +196,28 @@ export default function Header() {
                 {/* Language Selector */}
                 <div>
                   <h3 className="text-sm font-medium mb-3 text-muted-foreground">Language</h3>
-                  <div className="grid grid-cols-1 gap-2">
-                    {languages.map((lang) => (
-                      <Button
-                        key={lang.code}
-                        variant={currentLanguage === lang.code ? 'default' : 'ghost'}
-                        className="justify-start h-12"
-                        onClick={() => {
-                          changeLanguage(lang.code);
-                          setIsOpen(false);
-                        }}
-                      >
-                        <span className="mr-3 text-lg">{lang.flag}</span>
-                        {lang.name}
-                      </Button>
-                    ))}
-                  </div>
+                  <Select value={currentLanguage} onValueChange={changeLanguage}>
+                    <SelectTrigger className="w-full h-12">
+                      <SelectValue>
+                        <div className="flex items-center">
+                          <span className="mr-3 text-lg">
+                            {languages.find(l => l.code === currentLanguage)?.flag}
+                          </span>
+                          {languages.find(l => l.code === currentLanguage)?.name}
+                        </div>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="z-50 bg-background">
+                      {languages.map((lang) => (
+                        <SelectItem key={lang.code} value={lang.code}>
+                          <div className="flex items-center">
+                            <span className="mr-3 text-lg">{lang.flag}</span>
+                            {lang.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Navigation - Only show when user is logged in */}
@@ -233,13 +246,19 @@ export default function Header() {
                   <h3 className="text-sm font-medium mb-3 text-muted-foreground">Account</h3>
                   {user ? (
                     <div className="space-y-3">
-                      <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
+                      <button 
+                        onClick={() => {
+                          navigate('/profile');
+                          setIsOpen(false);
+                        }}
+                        className="w-full flex items-center space-x-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                      >
                         <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                           <span className="text-sm font-medium">
                             {profileData?.first_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
                           </span>
                         </div>
-                        <div>
+                        <div className="text-left">
                           <p className="text-sm font-medium">
                             {profileData?.first_name && profileData?.last_name 
                               ? `${profileData.first_name} ${profileData.last_name}`
@@ -247,7 +266,7 @@ export default function Header() {
                           </p>
                           <p className="text-xs text-muted-foreground">{user.email}</p>
                         </div>
-                      </div>
+                      </button>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 gap-3">

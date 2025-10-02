@@ -50,14 +50,25 @@ export default function AuthCallback() {
           return;
         }
 
+        // Get session for authentication
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          toast({
+            title: "Authentication Required",
+            description: "Please log in first before connecting Spotify",
+            variant: "destructive"
+          });
+          navigate('/');
+          return;
+        }
+
         // Exchange code for access token
-        const tokenData = await getAccessTokenFromCode(code);
+        const tokenData = await getAccessTokenFromCode(code, session.access_token);
         
         // Get Spotify profile
         const spotifyProfile = await getSpotifyProfile(tokenData.access_token);
 
         // Store tokens securely using edge function
-        const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch('https://yjdwjprbsduenqlcvxyd.supabase.co/functions/v1/store-spotify-tokens', {
           method: 'POST',
           headers: {

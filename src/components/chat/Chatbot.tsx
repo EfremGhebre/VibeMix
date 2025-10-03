@@ -1,20 +1,156 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { 
   MessageCircle, 
-  Send, 
+ 
   Bot, 
   User, 
   X, 
-  Minimize2,
   Maximize2,
   Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Support decision-tree types and config
+type FlowOption = {
+  id: string;
+  label: string;
+  next?: string; // next node id; if omitted, this is a terminal leaf
+  note?: string; // optional helper text
+};
+
+type FlowNode = {
+  id: string;
+  title: string;
+  prompt: string;
+  options: FlowOption[];
+};
+
+const SUPPORT_FLOW: Record<string, FlowNode> = {
+  root: {
+    id: 'root',
+    title: 'How can we help?',
+    prompt: 'Choose a topic to get started:',
+    options: [
+      { id: 'account', label: 'Account & Profile', next: 'account' },
+      { id: 'spotify', label: 'Spotify Connect', next: 'spotify' },
+      { id: 'playlists', label: 'Playlists & Discovery', next: 'playlists' },
+      { id: 'troubleshoot', label: 'Troubleshooting', next: 'troubleshoot' },
+    ],
+  },
+  account: {
+    id: 'account',
+    title: 'Account & Profile',
+    prompt: 'What do you need help with?',
+    options: [
+      { id: 'update-info', label: 'Update personal info', next: 'account_update' },
+      { id: 'password', label: 'Change password', next: 'account_password' },
+      { id: 'delete', label: 'Delete my account', next: 'account_delete' },
+    ],
+  },
+  account_update: {
+    id: 'account_update',
+    title: 'Update personal info',
+    prompt: 'Go to Profile > Settings to update your name and details.',
+    options: [
+      { id: 'open-settings', label: 'Open Settings' },
+    ],
+  },
+  account_password: {
+    id: 'account_password',
+    title: 'Change password',
+    prompt: 'Use Profile > Security > Change Password. You will receive a confirmation email.',
+    options: [
+      { id: 'open-security', label: 'Open Security' },
+    ],
+  },
+  account_delete: {
+    id: 'account_delete',
+    title: 'Delete account',
+    prompt: 'We are sorry to see you go. You can request deletion from Profile > Settings > Danger Zone.',
+    options: [
+      { id: 'open-danger', label: 'Open Danger Zone' },
+    ],
+  },
+  spotify: {
+    id: 'spotify',
+    title: 'Spotify Connect',
+    prompt: 'Select an option:',
+    options: [
+      { id: 'connect', label: 'Connect my Spotify', next: 'spotify_connect' },
+      { id: 'issues', label: 'Fix connection issues', next: 'spotify_fix' },
+    ],
+  },
+  spotify_connect: {
+    id: 'spotify_connect',
+    title: 'Connect Spotify',
+    prompt: 'Go to Settings > Connect Spotify and authorize VibeMix.',
+    options: [
+      { id: 'open-connect', label: 'Open Connect Spotify' },
+    ],
+  },
+  spotify_fix: {
+    id: 'spotify_fix',
+    title: 'Fix connection',
+    prompt: 'Try logging out/in, clear cookies for vibemix, and reconnect.',
+    options: [
+      { id: 'retry', label: 'Retry connect' },
+    ],
+  },
+  playlists: {
+    id: 'playlists',
+    title: 'Playlists & Discovery',
+    prompt: 'What would you like to do?',
+    options: [
+      { id: 'create', label: 'Create a new playlist', next: 'playlist_create' },
+      { id: 'mood', label: 'Use mood discovery', next: 'playlist_mood' },
+    ],
+  },
+  playlist_create: {
+    id: 'playlist_create',
+    title: 'Create playlist',
+    prompt: 'Select your mood, genres, and languages, then tap Generate.',
+    options: [
+      { id: 'open-discover', label: 'Open Discover' },
+    ],
+  },
+  playlist_mood: {
+    id: 'playlist_mood',
+    title: 'Mood discovery',
+    prompt: 'Explore moods from the Discover page and preview tracks.',
+    options: [
+      { id: 'open-discover2', label: 'Open Discover' },
+    ],
+  },
+  troubleshoot: {
+    id: 'troubleshoot',
+    title: 'Troubleshooting',
+    prompt: 'What is going wrong?',
+    options: [
+      { id: 'bug', label: 'I found a bug', next: 'bug_report' },
+      { id: 'load', label: 'App loads slowly', next: 'perf' },
+    ],
+  },
+  bug_report: {
+    id: 'bug_report',
+    title: 'Report a bug',
+    prompt: 'Please describe the issue via Help > Report, or email support@vibemix.app.',
+    options: [
+      { id: 'open-help', label: 'Open Help Page' },
+    ],
+  },
+  perf: {
+    id: 'perf',
+    title: 'Performance',
+    prompt: 'Try updating the app, clearing cache, and ensuring a stable connection.',
+    options: [
+      { id: 'learn-more', label: 'Performance tips' },
+    ],
+  },
+};
 
 interface Message {
   id: string;
@@ -36,100 +172,171 @@ interface ChatbotProps {
 }
 
 export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: "Hi! I'm VibeMix Assistant. How can I help you today?",
-      sender: 'bot',
-      timestamp: new Date(),
-      quickActions: [
-        { id: '1', text: 'How to create a playlist', action: 'How do I create a playlist?' },
-        { id: '2', text: 'Connect Spotify', action: 'How do I connect my Spotify account?' },
-        { id: '3', text: 'Account settings', action: 'How do I manage my account settings?' },
-        { id: '4', text: 'Troubleshooting', action: 'I need help with a problem' }
-      ]
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+ 
+  const [currentNodeId, setCurrentNodeId] = useState<string>('root');
+  const [history, setHistory] = useState<string[]>([]);
+
+  const showNode = (nodeId: string, userLabel?: string, pushHistoryFrom?: string) => {
+    const node = SUPPORT_FLOW[nodeId];
+    if (!node) return;
+
+    setIsTyping(true);
+
+    setMessages(prev => {
+      if (userLabel) {
+        const userMessage: Message = {
+          id: `user-${Date.now()}`,
+          text: userLabel,
+          sender: 'user',
+          timestamp: new Date(),
+        };
+        return [...prev, userMessage];
+      }
+      return prev;
+    });
+
+    setTimeout(() => {
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `bot-${Date.now()}`,
+          text: `${node.title}\n\n${node.prompt}`,
+          sender: 'bot',
+          timestamp: new Date(),
+          quickActions: node.options.map(o => ({ id: o.id, text: o.label, action: o.id }))
+        }
+      ]);
+      setIsTyping(false);
+    }, 300);
+
+    if (pushHistoryFrom) {
+      setHistory(prev => [...prev, pushHistoryFrom]);
+    }
+    setCurrentNodeId(nodeId);
+  };
+
+  // Initialize flow when opened
+  useEffect(() => {
+    if (!isOpen) return;
+    const node = SUPPORT_FLOW['root'];
+    setCurrentNodeId('root');
+    setHistory([]);
+    setMessages([
+      {
+        id: 'bot-root',
+        text: `${node.title}\n\n${node.prompt}`,
+        sender: 'bot',
+        timestamp: new Date(),
+        quickActions: node.options.map(o => ({ id: o.id, text: o.label, action: o.id }))
+      }
+    ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Focus input when chatbot opens
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
+  
 
-  const generateBotResponse = (userMessage: string): string => {
-    const message = userMessage.toLowerCase();
-    
-    // Common responses based on keywords
-    if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
-      return "Hello! Welcome to VibeMix! How can I assist you today?";
-    }
-    
-    if (message.includes('help') || message.includes('support')) {
-      return "I'm here to help! You can ask me about:\n• Creating playlists\n• Connecting Spotify\n• Account settings\n• Troubleshooting\n• Features and how to use them\n\nWhat would you like to know?";
-    }
-    
-    if (message.includes('playlist') || message.includes('music')) {
-      return "Great question about playlists! VibeMix helps you create personalized playlists based on your mood. You can:\n• Select your current mood\n• Choose your favorite genres\n• Pick music languages\n• Generate a custom playlist\n\nWould you like me to walk you through creating your first playlist?";
-    }
-    
-    if (message.includes('spotify') || message.includes('connect')) {
-      return "To connect Spotify:\n1. Go to Settings in your profile\n2. Click 'Connect Spotify'\n3. Authorize VibeMix to access your Spotify account\n4. Start creating playlists!\n\nNeed help with any of these steps?";
-    }
-    
-    if (message.includes('account') || message.includes('profile')) {
-      return "You can manage your account by:\n• Clicking on your profile picture in the top right\n• Updating your personal information\n• Changing your password\n• Managing your connected services\n\nIs there something specific about your account you'd like help with?";
-    }
-    
-    if (message.includes('bug') || message.includes('error') || message.includes('problem')) {
-      return "I'm sorry you're experiencing issues! Here are some common solutions:\n• Try refreshing the page\n• Clear your browser cache\n• Check your internet connection\n• Make sure you're using a supported browser\n\nIf the problem persists, please describe what's happening and I'll do my best to help!";
-    }
-    
-    if (message.includes('thank') || message.includes('thanks')) {
-      return "You're very welcome! I'm here whenever you need help. Feel free to ask me anything about VibeMix!";
-    }
-    
-    if (message.includes('bye') || message.includes('goodbye')) {
-      return "Goodbye! Thanks for using VibeMix. Come back anytime if you need help!";
-    }
-    
-    // Default response for unrecognized messages
-    return "That's an interesting question! While I'm still learning, I can help you with:\n• How to use VibeMix features\n• Creating and managing playlists\n• Account and settings help\n• General troubleshooting\n\nCould you rephrase your question or ask about one of these topics?";
+  const goToNode = (nextId: string, userLabel?: string) => {
+    showNode(nextId, userLabel, currentNodeId);
+  };
+
+  const goBack = () => {
+    setHistory(prev => {
+      const prevId = prev[prev.length - 1];
+      const rest = prev.slice(0, -1);
+      if (prevId) {
+        setHistory(rest);
+        // show previous without pushing history or user message
+        const node = SUPPORT_FLOW[prevId];
+        if (!node) return rest;
+        setIsTyping(true);
+        setCurrentNodeId(prevId);
+        setTimeout(() => {
+          setMessages(curr => [
+            ...curr,
+            {
+              id: `bot-${Date.now()}`,
+              text: `${node.title}\n\n${node.prompt}`,
+              sender: 'bot',
+              timestamp: new Date(),
+              quickActions: node.options.map(o => ({ id: o.id, text: o.label, action: o.id }))
+            }
+          ]);
+          setIsTyping(false);
+        }, 200);
+      }
+      return rest;
+    });
+  };
+
+  const startOver = () => {
+    const node = SUPPORT_FLOW['root'];
+    setHistory([]);
+    setCurrentNodeId('root');
+    setIsTyping(true);
+    setTimeout(() => {
+      setMessages(curr => [
+        ...curr,
+        {
+          id: `bot-${Date.now()}`,
+          text: `${node.title}\n\n${node.prompt}`,
+          sender: 'bot',
+          timestamp: new Date(),
+          quickActions: node.options.map(o => ({ id: o.id, text: o.label, action: o.id }))
+        }
+      ]);
+      setIsTyping(false);
+    }, 200);
   };
 
   const handleQuickAction = (action: string) => {
-    setInputText(action);
-    handleSendMessage(action);
+    if (action === 'back') { goBack(); return; }
+    if (action === 'start') { startOver(); return; }
+
+    const node = SUPPORT_FLOW[currentNodeId];
+    if (!node) return;
+    const picked = node.options.find(o => o.id === action);
+    if (!picked) return;
+    if (picked.next) {
+      goToNode(picked.next, picked.label);
+    } else {
+      // Terminal leaf: show follow-up "Start over" or "Back"
+      setMessages(prev => [
+        ...prev,
+        { id: `user-${Date.now()}`, text: picked.label, sender: 'user', timestamp: new Date() },
+        {
+          id: `bot-${Date.now() + 1}`,
+          text: 'What would you like to do next?',
+          sender: 'bot',
+          timestamp: new Date(),
+          quickActions: [
+            { id: 'back', text: 'Back', action: 'back' },
+            { id: 'start', text: 'Start over', action: 'start' },
+          ]
+        }
+      ]);
+      setIsTyping(false);
+    }
   };
 
   const handleCloseConversation = () => {
-    setMessages([
-      {
-        id: '1',
-        text: "Hi! I'm VibeMix Assistant. How can I help you today?",
-        sender: 'bot',
-        timestamp: new Date(),
-        quickActions: [
-          { id: '1', text: 'How to create a playlist', action: 'How do I create a playlist?' },
-          { id: '2', text: 'Connect Spotify', action: 'How do I connect my Spotify account?' },
-          { id: '3', text: 'Account settings', action: 'How do I manage my account settings?' },
-          { id: '4', text: 'Troubleshooting', action: 'I need help with a problem' }
-        ]
-      }
-    ]);
+    // reset flow
+    setCurrentNodeId('root');
+    setHistory([]);
+    setMessages([]);
     setInputText('');
     setIsTyping(false);
+    onToggle();
   };
 
   const handleMinimize = () => {
@@ -140,41 +347,9 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
     setIsMinimized(false);
   };
 
-  const handleSendMessage = async (messageText?: string) => {
-    const textToSend = messageText || inputText.trim();
-    if (!textToSend) return;
+  // special actions now handled explicitly in handleQuickAction
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: textToSend,
-      sender: 'user',
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInputText('');
-    setIsTyping(true);
-
-    // Simulate bot thinking time
-    setTimeout(() => {
-      const botResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        text: generateBotResponse(userMessage.text),
-        sender: 'bot',
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, botResponse]);
-      setIsTyping(false);
-    }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+  
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -188,7 +363,7 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 20 }}
           transition={{ duration: 0.2 }}
-          className="fixed bottom-20 right-4 z-50 sm:bottom-20 sm:right-4"
+          className="fixed inset-0 z-50 sm:inset-auto sm:bottom-40 sm:right-4"
         >
           {isMinimized ? (
             <Card className="w-80 h-16 shadow-2xl border-2">
@@ -214,7 +389,7 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={onToggle}
+                      onClick={handleCloseConversation}
                       className="h-6 w-6 p-0 hover:bg-primary hover:text-primary-foreground"
                       title="Close chat"
                     >
@@ -225,30 +400,32 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
               </CardHeader>
             </Card>
           ) : (
-            <Card className="w-80 h-96 shadow-2xl border-2">
-            <CardHeader className="pb-3">
+            <Card className="w-full h-full sm:w-80 sm:h-96 shadow-2xl border-2 rounded-none sm:rounded-lg flex flex-col min-h-0">
+            <CardHeader className="pb-2 sm:pb-3 border-b">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Bot className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-lg">VibeMix Assistant</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">VibeMix Assistant</CardTitle>
                   <Badge className="text-xs bg-primary text-primary-foreground">
                     Online
                   </Badge>
                 </div>
                 <div className="flex items-center space-x-1">
+                  {history.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={goBack}
+                      className="h-6 px-2 text-xs hover:bg-primary hover:text-primary-foreground"
+                      title="Back"
+                    >
+                      Back
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={handleMinimize}
-                    className="h-6 w-6 p-0 hover:bg-primary hover:text-primary-foreground hidden lg:inline-flex"
-                    title="Minimize"
-                  >
-                    <Minimize2 className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onToggle}
+                    onClick={handleCloseConversation}
                     className="h-6 w-6 p-0 hover:bg-primary hover:text-primary-foreground"
                     title="Close chat"
                   >
@@ -258,8 +435,8 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
               </div>
             </CardHeader>
             
-            <CardContent className="p-0 flex flex-col h-80">
-              <ScrollArea className="flex-1 px-4">
+            <CardContent className="p-0 flex flex-col flex-1 min-h-0 sm:h-80">
+              <ScrollArea className="flex-1 min-h-0 px-4 py-3">
                 <div className="space-y-4 pb-4">
                   {messages.map((message) => (
                     <motion.div
@@ -335,26 +512,7 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
                 </div>
               </ScrollArea>
               
-              <div className="border-t p-3">
-                <div className="flex space-x-2">
-                  <Input
-                    ref={inputRef}
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Type your message..."
-                    className="flex-1"
-                    disabled={isTyping}
-                  />
-                  <Button
-                    onClick={() => handleSendMessage()}
-                    disabled={!inputText.trim() || isTyping}
-                    size="sm"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+              
             </CardContent>
           </Card>
           )}
@@ -370,7 +528,7 @@ export function ChatbotToggle({ isOpen, onToggle }: ChatbotProps) {
     <motion.div
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className="fixed bottom-4 right-4 z-40"
+      className="hidden sm:fixed sm:bottom-40 sm:right-4 sm:z-40"
     >
       <Button
         onClick={onToggle}

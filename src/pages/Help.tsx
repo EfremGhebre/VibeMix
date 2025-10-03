@@ -50,7 +50,7 @@ export default function Help() {
               <CardHeader>
                 <MessageSquare className="h-12 w-12 text-primary mx-auto mb-2" />
                 <CardTitle>Live Chat</CardTitle>
-                <CardDescription>Get instant help from our support team</CardDescription>
+                <CardDescription>VibeMix AI Assistant: Instant help, 24/7.</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button 

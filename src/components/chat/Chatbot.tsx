@@ -181,7 +181,32 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
   const [currentNodeId, setCurrentNodeId] = useState<string>('root');
   const [history, setHistory] = useState<string[]>([]);
 
-  const showNode = (nodeId: string, userLabel?: string, pushHistoryFrom?: string) => {
+  const appendResolutionPrompt = (options: { includeBack?: boolean } = {}) => {
+    const actions = [
+      { id: 'yes_helpful', text: 'Yes, resolved', action: 'yes_helpful' },
+      { id: 'no_helpful', text: 'No, need more help', action: 'no_helpful' },
+    ];
+    if (options.includeBack) {
+      actions.push({ id: 'back', text: 'Back', action: 'back' });
+    }
+    setMessages(prev => [
+      ...prev,
+      {
+        id: `bot-followup-${Date.now()}`,
+        text: 'Was this helpful?',
+        sender: 'bot',
+        timestamp: new Date(),
+        quickActions: actions,
+      },
+    ]);
+  };
+
+  const showNode = (
+    nodeId: string,
+    userLabel?: string,
+    pushHistoryFrom?: string,
+    includeOptions: boolean = true
+  ) => {
     const node = SUPPORT_FLOW[nodeId];
     if (!node) return;
 
@@ -208,10 +233,14 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
           text: `${node.title}\n\n${node.prompt}`,
           sender: 'bot',
           timestamp: new Date(),
-          quickActions: node.options.map(o => ({ id: o.id, text: o.label, action: o.id }))
+          quickActions: includeOptions ? node.options.map(o => ({ id: o.id, text: o.label, action: o.id })) : undefined
         }
       ]);
       setIsTyping(false);
+      const depthAfter = pushHistoryFrom ? history.length + 1 : history.length;
+      if (depthAfter >= 2) {
+        appendResolutionPrompt({ includeBack: history.length > 0 });
+      }
     }, 300);
 
     if (pushHistoryFrom) {
@@ -247,7 +276,9 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
   
 
   const goToNode = (nextId: string, userLabel?: string) => {
-    showNode(nextId, userLabel, currentNodeId);
+    const nextDepth = history.length + 1; // after pushing current
+    const includeOptions = nextDepth < 2; // hide options starting at depth 2 (after second selection)
+    showNode(nextId, userLabel, currentNodeId, includeOptions);
   };
 
   const goBack = () => {
@@ -273,6 +304,7 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
             }
           ]);
           setIsTyping(false);
+          appendResolutionPrompt({ includeBack: rest.length > 0 });
         }, 200);
       }
       return rest;
@@ -296,12 +328,39 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
         }
       ]);
       setIsTyping(false);
+      appendResolutionPrompt();
     }, 200);
   };
 
   const handleQuickAction = (action: string) => {
     if (action === 'back') { goBack(); return; }
     if (action === 'start') { startOver(); return; }
+    if (action === 'yes_helpful') {
+      setMessages(prev => [
+        ...prev,
+        { id: `user-${Date.now()}`, text: 'Yes, resolved', sender: 'user', timestamp: new Date() },
+        { id: `bot-${Date.now() + 1}`, text: 'Glad we could help! You can reopen VibeMix AI Assistant anytime.', sender: 'bot', timestamp: new Date() }
+      ]);
+      setTimeout(() => handleCloseConversation(), 3800);
+      return;
+    }
+    if (action === 'no_helpful') {
+      setMessages(prev => [
+        ...prev,
+        { id: `user-${Date.now()}`, text: 'No, need more help', sender: 'user', timestamp: new Date() },
+        {
+          id: `bot-${Date.now() + 1}`,
+          text: 'No worries—try going back or start over for more options.',
+          sender: 'bot',
+          timestamp: new Date(),
+          quickActions: [
+            { id: 'back', text: 'Back', action: 'back' },
+            { id: 'start', text: 'Start over', action: 'start' },
+          ]
+        }
+      ]);
+      return;
+    }
 
     const node = SUPPORT_FLOW[currentNodeId];
     if (!node) return;
@@ -326,8 +385,19 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
         }
       ]);
       setIsTyping(false);
+      const depthAfter = history.length + 1; // considering current selection
+      if (depthAfter >= 2) {
+        appendResolutionPrompt({ includeBack: history.length > 0 });
+      }
     }
   };
+
+  // Handle helpfulness answers
+  useEffect(() => {
+    const last = messages[messages.length - 1];
+    if (!last) return;
+    // noop: actions handled via handleQuickAction
+  }, [messages]);
 
   const handleCloseConversation = () => {
     // reset flow
@@ -400,7 +470,7 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
               </CardHeader>
             </Card>
           ) : (
-            <Card className="w-full h-full sm:w-80 sm:h-96 shadow-2xl border-2 rounded-none sm:rounded-lg flex flex-col min-h-0">
+            <Card className="w-full h-full sm:w-80 sm:h-[32rem] shadow-2xl border-2 rounded-none sm:rounded-lg flex flex-col min-h-0">
             <CardHeader className="pb-2 sm:pb-3 border-b">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -435,8 +505,8 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
               </div>
             </CardHeader>
             
-            <CardContent className="p-0 flex flex-col flex-1 min-h-0 sm:h-80">
-              <ScrollArea className="flex-1 min-h-0 px-4 py-3">
+            <CardContent className="p-0 flex flex-col h-[100dvh] min-h-0 sm:h-[28rem]">
+              <ScrollArea className="flex-1 min-h-0 px-4 py-4">
                 <div className="space-y-4 pb-4">
                   {messages.map((message) => (
                     <motion.div
@@ -445,7 +515,7 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
                       animate={{ opacity: 1, y: 0 }}
                       className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                      <div className={`flex items-start space-x-2 max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                      <div className={`flex items-start space-x-2 max-w-[90%] ${message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
                           message.sender === 'user' 
                             ? 'bg-primary text-primary-foreground' 

@@ -1,12 +1,40 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { HelpCircle, MessageSquare, Book, Mail, Phone, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useState } from 'react';
 import Chatbot, { ChatbotToggle } from '@/components/chat/Chatbot';
 
 export default function Help() {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    category: 'general',
+    subject: '',
+    message: ''
+  });
+
+  const handleSupportSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name || !form.email || !form.subject || !form.message) {
+      alert('Please fill all required fields.');
+      return;
+    }
+    
+    // Simple success message
+    alert('Thank you for your message! We will get back to you soon.');
+    
+    setIsEmailDialogOpen(false);
+    setForm({ name: '', email: '', category: 'general', subject: '', message: '' });
+  };
   const faqItems = [
     {
       question: "How do I connect my Spotify account?",
@@ -62,30 +90,127 @@ export default function Help() {
               </CardContent>
             </Card>
 
-            <Card className="text-center hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Mail className="h-12 w-12 text-primary mx-auto mb-2" />
-                <CardTitle>Email Support</CardTitle>
-                <CardDescription>Send us a detailed message</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full">
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  support@vibemix.com
-                </Button>
-              </CardContent>
-            </Card>
+            <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
+              <DialogTrigger asChild>
+                <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardHeader>
+                    <Mail className="h-12 w-12 text-primary mx-auto mb-2" />
+                    <CardTitle>Email Support</CardTitle>
+                    <CardDescription>Send us a detailed message</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" className="w-full">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      support@vibemix.app
+                    </Button>
+                  </CardContent>
+                </Card>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Contact Support</DialogTitle>
+                  <DialogDescription>Fill in the details below and we’ll get back to you.</DialogDescription>
+                </DialogHeader>
+                <form className="space-y-4" onSubmit={handleSupportSubmit}>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium">Full name</label>
+                      <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Jane Doe" required />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Email</label>
+                      <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" required />
+                    </div>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium">Category</label>
+                      <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="general">General</SelectItem>
+                          <SelectItem value="account">Account</SelectItem>
+                          <SelectItem value="spotify">Spotify</SelectItem>
+                          <SelectItem value="playlists">Playlists</SelectItem>
+                          <SelectItem value="bug">Bug report</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Subject</label>
+                      <Input value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} placeholder="Short summary" required />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Message</label>
+                    <Textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Describe the issue, steps to reproduce, device/browser..." rows={6} required />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button type="button" variant="outline" onClick={() => setIsEmailDialogOpen(false)}>Cancel</Button>
+                    <Button type="submit">Send message</Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
 
-            <Card className="text-center hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Book className="h-12 w-12 text-primary mx-auto mb-2" />
-                <CardTitle>User Guide</CardTitle>
-                <CardDescription>Learn how to use all features</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full">View Guide</Button>
-              </CardContent>
-            </Card>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardHeader>
+                    <Book className="h-12 w-12 text-primary mx-auto mb-2" />
+                    <CardTitle className="text-center">User Guide</CardTitle>
+                    <CardDescription className="text-center">Step-by-step guides for getting started, playlists, Spotify, and fixes.</CardDescription>
+                  </CardHeader>
+                </Card>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>User Guide</DialogTitle>
+                  <DialogDescription>Follow these steps to get the most out of VibeMix.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-6 text-left">
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Getting Started</h4>
+                    <ol className="list-decimal pl-5 space-y-1 text-sm text-muted-foreground">
+                      <li>Open Discover from the main navigation.</li>
+                      <li>Pick your mood to guide recommendations.</li>
+                      <li>Select favorite genres and languages.</li>
+                      <li>Preview suggested tracks and artists.</li>
+                      <li>Save your picks to a playlist.</li>
+                    </ol>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Connect Spotify</h4>
+                    <ol className="list-decimal pl-5 space-y-1 text-sm text-muted-foreground">
+                      <li>Go to Profile → Settings.</li>
+                      <li>Click Connect Spotify.</li>
+                      <li>Authorize VibeMix in the Spotify window.</li>
+                      <li>Return to VibeMix and confirm Connected status.</li>
+                    </ol>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Create Playlists</h4>
+                    <ol className="list-decimal pl-5 space-y-1 text-sm text-muted-foreground">
+                      <li>Choose mood, genres, and languages.</li>
+                      <li>Tap Generate to build a playlist.</li>
+                      <li>Rename and save to Spotify.</li>
+                      <li>Re‑generate to refine results.</li>
+                    </ol>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2">Troubleshooting</h4>
+                    <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                      <li>Refresh the page and retry the action.</li>
+                      <li>Log out/in, then reconnect Spotify.</li>
+                      <li>Clear site data/cache for vibemix.</li>
+                      <li>Try a supported, updated browser.</li>
+                    </ul>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
 
           {/* FAQ Section */}

@@ -22,18 +22,32 @@ export default function Help() {
     message: ''
   });
 
-  const handleSupportSubmit = (e: React.FormEvent) => {
+  const handleSupportSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.subject || !form.message) {
       alert('Please fill all required fields.');
       return;
     }
     
-    // Simple success message
-    alert('Thank you for your message! We will get back to you soon.');
+    setSubmitting(true);
     
-    setIsEmailDialogOpen(false);
-    setForm({ name: '', email: '', category: 'general', subject: '', message: '' });
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data, error } = await supabase.functions.invoke('send-support-email', {
+        body: form
+      });
+
+      if (error) throw error;
+
+      alert('Thank you for your message! We will get back to you soon.');
+      setIsEmailDialogOpen(false);
+      setForm({ name: '', email: '', category: 'general', subject: '', message: '' });
+    } catch (error) {
+      console.error('Error sending support email:', error);
+      alert('Failed to send message. Please try again or email us directly at support@vibemix.app');
+    } finally {
+      setSubmitting(false);
+    }
   };
   const faqItems = [
     {
@@ -148,8 +162,10 @@ export default function Help() {
                     <Textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Describe the issue, steps to reproduce, device/browser..." rows={6} required />
                   </div>
                   <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" onClick={() => setIsEmailDialogOpen(false)}>Cancel</Button>
-                    <Button type="submit">Send message</Button>
+                    <Button type="button" variant="outline" onClick={() => setIsEmailDialogOpen(false)} disabled={submitting}>Cancel</Button>
+                    <Button type="submit" disabled={submitting}>
+                      {submitting ? 'Sending...' : 'Send message'}
+                    </Button>
                   </div>
                 </form>
               </DialogContent>

@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useState } from 'react';
 import Chatbot, { ChatbotToggle } from '@/components/chat/Chatbot';
+import { toast } from 'sonner';
 
 export default function Help() {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
@@ -25,7 +26,9 @@ export default function Help() {
   const handleSupportSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.subject || !form.message) {
-      alert('Please fill all required fields.');
+      toast.error('Please fill all required fields', {
+        description: 'All fields marked with * are required'
+      });
       return;
     }
     
@@ -39,12 +42,16 @@ export default function Help() {
 
       if (error) throw error;
 
-      alert('Thank you for your message! We will get back to you soon.');
+      toast.success('Message sent successfully!', {
+        description: 'Thank you for contacting us. We\'ll get back to you soon.'
+      });
       setIsEmailDialogOpen(false);
       setForm({ name: '', email: '', category: 'general', subject: '', message: '' });
     } catch (error) {
       console.error('Error sending support email:', error);
-      alert('Failed to send message. Please try again or email us directly at support@vibemix.app');
+      toast.error('Failed to send message', {
+        description: 'Please try again or email us directly at support@vibemix.app'
+      });
     } finally {
       setSubmitting(false);
     }

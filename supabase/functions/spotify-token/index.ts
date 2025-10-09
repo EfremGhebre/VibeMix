@@ -16,7 +16,7 @@ function validateInput(data: any) {
   const { code, redirect_uri } = data;
   
   // Validate code format and length
-  if (!code || typeof code !== 'string' || code.length > 512 || !/^[A-Za-z0-9_-]+$/.test(code)) {
+  if (!code || typeof code !== 'string' || code.length > 1024) {
     throw new Error('Invalid authorization code format');
   }
   
@@ -70,6 +70,8 @@ serve(async (req) => {
     const requestData = await req.json();
     const { code, redirect_uri } = validateInput(requestData);
     
+    console.log('Processing Spotify auth code (length:', code.length, ')');
+    
     if (!code || !redirect_uri) {
       throw new Error('Missing required parameters');
     }
@@ -77,6 +79,11 @@ serve(async (req) => {
     const spotifyClientId = Deno.env.get('SPOTIFY_CLIENT_ID');
     if (!spotifyClientId) {
       throw new Error('Spotify client ID not configured');
+    }
+
+    const spotifyClientSecret = Deno.env.get('SPOTIFY_CLIENT_SECRET');
+    if (!spotifyClientSecret) {
+      throw new Error('Spotify client secret not configured');
     }
 
     // Exchange authorization code for access token
@@ -90,12 +97,13 @@ serve(async (req) => {
         code,
         redirect_uri,
         client_id: spotifyClientId,
+        client_secret: spotifyClientSecret,
       }),
     });
 
     if (!tokenResponse.ok) {
       const errorData = await tokenResponse.text();
-      console.error('Spotify token exchange failed:', errorData);
+      console.error('Spotify token exchange failed. Status:', tokenResponse.status, 'Error:', errorData);
       throw new Error('Failed to exchange code for token');
     }
 

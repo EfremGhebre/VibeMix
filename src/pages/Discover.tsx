@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Music2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,15 +9,38 @@ import LanguageFilter from '@/components/filters/LanguageFilter';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { hasSpotifyConnection } from '@/lib/spotify-secure';
+import { SpotifyConnectButton } from '@/components/spotify/SpotifyConnectButton';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function Discover() {
   const [selectedMood, setSelectedMood] = useState<string>('');
   const [selectedGenres, setSelectedGenres] = useState<string[]>(['Pop']);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['en']);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [hasSpotify, setHasSpotify] = useState<boolean | null>(null);
   const { toast } = useToast();
   const { t } = useLanguage();
   const { user } = useAuth();
+
+  useEffect(() => {
+    const checkSpotifyConnection = async () => {
+      if (!user) {
+        setHasSpotify(false);
+        return;
+      }
+      
+      try {
+        const connected = await hasSpotifyConnection();
+        setHasSpotify(connected);
+      } catch (error) {
+        console.error('Error checking Spotify connection:', error);
+        setHasSpotify(false);
+      }
+    };
+
+    checkSpotifyConnection();
+  }, [user]);
 
   const handleGenreToggle = (genre: string) => {
     setSelectedGenres(prev => 
@@ -36,6 +59,15 @@ export default function Discover() {
   };
 
   const handleGeneratePlaylist = async () => {
+    if (!hasSpotify) {
+      toast({
+        title: "Spotify not connected",
+        description: "Please connect your Spotify account first to generate playlists",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!selectedMood) {
       toast({
         title: "Please select a mood",
@@ -133,6 +165,27 @@ export default function Discover() {
             {t('discover.subtitle')}
           </p>
         </motion.div>
+
+        {hasSpotify === false && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl mx-auto mb-8"
+          >
+            <Card className="border-primary/20 bg-primary/5">
+              <CardContent className="pt-6 text-center space-y-4">
+                <Music2 className="w-12 h-12 mx-auto text-primary" />
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Connect Spotify to Continue</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    To generate personalized playlists based on your mood and preferences, you'll need to connect your Spotify account.
+                  </p>
+                </div>
+                <SpotifyConnectButton size="lg" />
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         <div className="max-w-6xl mx-auto space-y-12 sm:space-y-16">
           {/* Mood Selection */}

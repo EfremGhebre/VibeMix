@@ -3,6 +3,7 @@ import { Music } from 'lucide-react';
 import { getSpotifyAuthUrl } from '@/lib/spotify';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SpotifyConnectButtonProps {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
@@ -17,11 +18,11 @@ export function SpotifyConnectButton({
 }: SpotifyConnectButtonProps) {
   const { user, session, loading } = useAuth();
 
-  const handleConnect = () => {
-    // Check both user and session for more reliable authentication state
-    const isAuthenticated = !!(user && session);
+  const handleConnect = async () => {
+    // Check authentication with Supabase directly
+    const { data: { session: currentSession } } = await supabase.auth.getSession();
     
-    if (!isAuthenticated) {
+    if (!currentSession?.user) {
       toast({
         title: "Login Required",
         description: "Please log in first before connecting to Spotify",

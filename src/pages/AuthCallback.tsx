@@ -2,14 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getAccessTokenFromCode, getSpotifyProfile } from '@/lib/spotify';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 
 export default function AuthCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
@@ -40,19 +38,9 @@ export default function AuthCallback() {
           return;
         }
 
-        if (!user) {
-          toast({
-            title: "Authentication Required",
-            description: "Please log in first before connecting Spotify",
-            variant: "destructive"
-          });
-          navigate('/');
-          return;
-        }
-
         // Get session for authentication
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.access_token) {
+        if (!session?.access_token || !session?.user) {
           toast({
             title: "Authentication Required",
             description: "Please log in first before connecting Spotify",
@@ -110,7 +98,7 @@ export default function AuthCallback() {
     };
 
     handleSpotifyCallback();
-  }, [searchParams, navigate, user]);
+  }, [searchParams, navigate]);
 
   if (isProcessing) {
     return (

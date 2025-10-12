@@ -1,5 +1,5 @@
 const SPOTIFY_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-const REDIRECT_URI = `${window.location.protocol}//${window.location.host}/auth/callback`;
+const REDIRECT_URI = 'https://vibemix.app/auth/callback';
 const SCOPES = [
   'user-read-private',
   'user-read-email',

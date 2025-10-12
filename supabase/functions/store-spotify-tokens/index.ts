@@ -126,6 +126,8 @@ serve(async (req) => {
         expires_at,
         scope,
         token_type: 'Bearer'
+      }, {
+        onConflict: 'user_id'
       });
 
     if (tokenError) {
@@ -140,6 +142,8 @@ serve(async (req) => {
         user_id: user.id,
         spotify_user_id,
         spotify_display_name
+      }, {
+        onConflict: 'user_id'
       });
 
     if (prefsError) {

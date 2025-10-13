@@ -1,4 +1,11 @@
+// @ts-ignore - URL imports are resolved by Deno at runtime
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+
+// Minimal Deno globals for TypeScript in non-Deno tooling
+declare const Deno: {
+  serve: (handler: (req: Request) => Response | Promise<Response>) => void;
+  env: { get: (key: string) => string | undefined };
+};
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

@@ -4,7 +4,11 @@ import { Radio, Sparkles, Stars, ArrowRight, Globe, Smile, Music2, MessageCircle
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 
-const Index = () => {
+interface IndexProps {
+  onOpenChat?: () => void;
+}
+
+const Index = ({ onOpenChat }: IndexProps) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 

@@ -329,7 +329,44 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {/* Thank You Overlay */}
+      {showThankYou && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          className="fixed bottom-28 right-6 z-[60] sm:bottom-28 sm:right-6"
+        >
+          <Card className="w-72 shadow-2xl border-2 border-primary/30">
+            <CardContent className="p-6 text-center">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 300, delay: 0.1 }}
+                className="text-4xl mb-3"
+              >
+                🎵
+              </motion.div>
+              <h3 className="text-lg font-semibold mb-1">Thank you!</h3>
+              <p className="text-sm text-muted-foreground">
+                Glad I could help. Enjoy your vibes! 🎶
+              </p>
+              <motion.div
+                className="mt-3 h-1 bg-primary/20 rounded-full overflow-hidden"
+              >
+                <motion.div
+                  className="h-full bg-primary rounded-full"
+                  initial={{ width: '100%' }}
+                  animate={{ width: '0%' }}
+                  transition={{ duration: 3, ease: 'linear' }}
+                />
+              </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {isOpen && !showThankYou && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -365,7 +402,7 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
                     <Bot className="h-5 w-5 text-primary" />
                     <CardTitle className="text-base sm:text-lg">VibeMix AI</CardTitle>
                     <Badge className="text-xs bg-primary/20 text-primary border-primary/30">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block mr-1 animate-pulse" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block mr-1 animate-pulse" />
                       Online
                     </Badge>
                   </div>

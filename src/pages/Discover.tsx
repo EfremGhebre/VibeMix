@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Music2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,63 +6,59 @@ import { useToast } from '@/hooks/use-toast';
 import MoodGrid from '@/components/mood/MoodGrid';
 import GenreFilter from '@/components/filters/GenreFilter';
 import LanguageFilter from '@/components/filters/LanguageFilter';
+import PlaylistResult from '@/components/playlist/PlaylistResult';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { hasSpotifyConnection } from '@/lib/spotify-secure';
-import { SpotifyConnectButton } from '@/components/spotify/SpotifyConnectButton';
-import { Card, CardContent } from '@/components/ui/card';
+
+interface GeneratedPlaylist {
+  id: string;
+  title: string;
+  description: string;
+  mood: string;
+  track_count: number;
+  tracks: Array<{
+    title: string;
+    artist: string;
+    album?: string;
+    genre?: string;
+    language?: string;
+    energy_score?: number;
+    mood_tags?: string[];
+    spotify_search_url?: string;
+    apple_music_search_url?: string;
+    youtube_music_search_url?: string;
+  }>;
+}
 
 export default function Discover() {
   const [selectedMood, setSelectedMood] = useState<string>('');
-  const [selectedGenres, setSelectedGenres] = useState<string[]>(['Pop']);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['en']);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [hasSpotify, setHasSpotify] = useState<boolean | null>(null);
+  const [generatedPlaylist, setGeneratedPlaylist] = useState<GeneratedPlaylist | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
   const { user } = useAuth();
 
-  useEffect(() => {
-    const checkSpotifyConnection = async () => {
-      if (!user) {
-        setHasSpotify(false);
-        return;
-      }
-      
-      try {
-        const connected = await hasSpotifyConnection();
-        setHasSpotify(connected);
-      } catch (error) {
-        console.error('Error checking Spotify connection:', error);
-        setHasSpotify(false);
-      }
-    };
-
-    checkSpotifyConnection();
-  }, [user]);
-
   const handleGenreToggle = (genre: string) => {
     setSelectedGenres(prev => 
-      prev.includes(genre) 
-        ? prev.filter(g => g !== genre)
-        : [...prev, genre]
+      prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
     );
   };
 
   const handleLanguageToggle = (languageCode: string) => {
     setSelectedLanguages(prev => 
-      prev.includes(languageCode)
-        ? prev.filter(l => l !== languageCode)
-        : [...prev, languageCode]
+      prev.includes(languageCode) ? prev.filter(l => l !== languageCode) : [...prev, languageCode]
     );
   };
 
   const handleGeneratePlaylist = async () => {
-    if (!hasSpotify) {
+    if (!user) {
       toast({
-        title: "Spotify not connected",
-        description: "Please connect your Spotify account first to generate playlists",
+        title: "Sign in required",
+        description: "Please sign in to generate and save your playlists.",
         variant: "destructive",
       });
       return;
@@ -70,84 +66,93 @@ export default function Discover() {
 
     if (!selectedMood) {
       toast({
-        title: "Please select a mood",
-        description: "Choose how you're feeling to generate your playlist",
+        title: t('discover.selectMoodTitle'),
+        description: t('discover.selectMoodDesc'),
         variant: "destructive",
       });
       return;
     }
 
-    if (selectedGenres.length === 0) {
+    if (selectedLanguages.length === 0) {
       toast({
-        title: "Please select at least one genre",
-        description: "Pick some music genres you'd like to hear",
+        title: "Select a language",
+        description: "Choose at least one music language for your mix.",
         variant: "destructive",
       });
       return;
     }
 
     setIsGenerating(true);
+    setGeneratedPlaylist(null);
+    setIsSaved(false);
 
     try {
-      // Call our playlist generation edge function
       const { data, error } = await supabase.functions.invoke('generate-playlist', {
         body: {
           mood: selectedMood,
           genres: selectedGenres,
           languages: selectedLanguages,
-          userId: user?.id,
+          userId: user.id,
         }
       });
 
       if (error) {
-        console.error('Playlist generation error:', error);
-        
-        // Try to extract the specific error message from the edge function response
-        let errorMessage = "Please make sure you're logged in and have connected Spotify.";
-        
+        let errorMessage = "Something went wrong. Please try again.";
         if (error.message) {
-          // If it's a supabase error with details
           try {
             const errorData = JSON.parse(error.message);
             errorMessage = errorData.error || error.message;
           } catch {
-            // If parsing fails, use the message as is
             errorMessage = error.message;
           }
         }
-        
-        toast({
-          title: "Failed to generate playlist",
-          description: errorMessage,
-          variant: "destructive",
-        });
+        toast({ title: "Failed to generate mix", description: errorMessage, variant: "destructive" });
         return;
       }
 
-      const playlist = data.playlist;
+      setGeneratedPlaylist(data.playlist);
       toast({
-        title: "🎵 Playlist generated!",
-        description: `Created "${playlist.title}" with ${playlist.track_count} tracks. Check your profile to view it!`,
+        title: "🎵 Your mix is ready!",
+        description: `Created "${data.playlist.title}" with ${data.playlist.track_count} tracks.`,
       });
-
-      // Reset form
-      setSelectedMood('');
-      setSelectedGenres(['Pop']);
-      setSelectedLanguages(['en']);
-
     } catch (error) {
       console.error('Error generating playlist:', error);
-      toast({
-        title: "Error",
-        description: "Failed to generate playlist. Please try again.",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to generate mix. Please try again.", variant: "destructive" });
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const canGeneratePlaylist = selectedMood && selectedGenres.length > 0 && selectedLanguages.length > 0;
+  const handleSave = async () => {
+    if (!user || !generatedPlaylist) return;
+    try {
+      const { error } = await supabase
+        .from('saved_vibes')
+        .insert({
+          user_id: user.id,
+          playlist_id: generatedPlaylist.id,
+        });
+      if (error) throw error;
+      setIsSaved(true);
+      toast({ title: "Mix saved!", description: "Find it in your Saved Vibes." });
+    } catch (error) {
+      console.error('Error saving:', error);
+      toast({ title: "Error", description: "Failed to save mix.", variant: "destructive" });
+    }
+  };
+
+  const handleRegenerate = () => {
+    setGeneratedPlaylist(null);
+    setIsSaved(false);
+    handleGeneratePlaylist();
+  };
+
+  const handleCloseResult = () => {
+    setGeneratedPlaylist(null);
+    setIsSaved(false);
+  };
+
+  const canGenerate = selectedMood && selectedLanguages.length > 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-surface-elevated">
@@ -166,76 +171,66 @@ export default function Discover() {
           </p>
         </motion.div>
 
-        {hasSpotify === false && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-2xl mx-auto mb-8"
-          >
-            <Card className="border-primary/20 bg-primary/5">
-              <CardContent className="pt-6 text-center space-y-4">
-                <Music2 className="w-12 h-12 mx-auto text-primary" />
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Connect Spotify to Continue</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    To generate personalized playlists based on your mood and preferences, you'll need to connect your Spotify account.
-                  </p>
-                </div>
-                <SpotifyConnectButton size="lg" />
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
+        {/* Show result if generated */}
+        {generatedPlaylist ? (
+          <PlaylistResult
+            playlist={generatedPlaylist}
+            onSave={handleSave}
+            onRegenerate={handleRegenerate}
+            onClose={handleCloseResult}
+            saved={isSaved}
+          />
+        ) : (
+          <div className="max-w-6xl mx-auto space-y-12 sm:space-y-16">
+            {/* Mood Selection */}
+            <MoodGrid selectedMood={selectedMood} onMoodSelect={setSelectedMood} />
 
-        <div className="max-w-6xl mx-auto space-y-12 sm:space-y-16">
-          {/* Mood Selection */}
-          <MoodGrid selectedMood={selectedMood} onMoodSelect={setSelectedMood} />
+            {/* Language Filter - PROMINENT */}
+            <LanguageFilter selectedLanguages={selectedLanguages} onLanguageToggle={handleLanguageToggle} />
 
-          {/* Genre Filter */}
-          <GenreFilter selectedGenres={selectedGenres} onGenreToggle={handleGenreToggle} />
+            {/* Genre Filter - Optional */}
+            <GenreFilter selectedGenres={selectedGenres} onGenreToggle={handleGenreToggle} />
 
-          {/* Language Filter */}
-          <LanguageFilter selectedLanguages={selectedLanguages} onLanguageToggle={handleLanguageToggle} />
-
-          {/* Generate Button */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="text-center pt-6 sm:pt-8"
-          >
-            <Button
-              onClick={handleGeneratePlaylist}
-              disabled={!canGeneratePlaylist || isGenerating}
-              className="hero-button text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 relative group h-14 sm:h-16 touch-manipulation"
+            {/* Generate Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="text-center pt-6 sm:pt-8"
             >
-              {isGenerating ? (
-                <>
-                  <Music2 className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
-                  <span className="hidden sm:inline">{t('discover.creatingVibe')}</span>
-                  <span className="sm:hidden">{t('discover.creating')}</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 group-hover:animate-bounce" />
-                  <span className="hidden sm:inline">{t('button.generatePlaylist')}</span>
-                  <span className="sm:hidden">{t('discover.generate')}</span>
-                </>
-              )}
-            </Button>
-            
-            {selectedMood && selectedGenres.length > 0 && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-xs sm:text-sm text-muted-foreground mt-4 px-4 leading-relaxed"
+              <Button
+                onClick={handleGeneratePlaylist}
+                disabled={!canGenerate || isGenerating}
+                className="hero-button text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 relative group h-14 sm:h-16 touch-manipulation"
               >
-                {t('discover.readyGenerate')} <span className="text-primary font-medium">{selectedMood}</span> {t('discover.playlistWith')}{' '}
-                <span className="text-secondary font-medium">{selectedGenres.join(', ')}</span> {t('discover.music')}
-              </motion.p>
-            )}
-          </motion.div>
-        </div>
+                {isGenerating ? (
+                  <>
+                    <Music2 className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                    <span className="hidden sm:inline">{t('discover.creatingVibe')}</span>
+                    <span className="sm:hidden">{t('discover.creating')}</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 group-hover:animate-bounce" />
+                    <span className="hidden sm:inline">{t('button.generateMix')}</span>
+                    <span className="sm:hidden">{t('discover.generate')}</span>
+                  </>
+                )}
+              </Button>
+              
+              {selectedMood && selectedLanguages.length > 0 && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-xs sm:text-sm text-muted-foreground mt-4 px-4 leading-relaxed"
+                >
+                  {t('discover.readyGenerate')} <span className="text-primary font-medium capitalize">{selectedMood}</span> {t('discover.mixIn')}{' '}
+                  <span className="text-secondary font-medium">{selectedLanguages.length} {selectedLanguages.length === 1 ? 'language' : 'languages'}</span>
+                </motion.p>
+              )}
+            </motion.div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,7 @@
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Radio, Sparkles, Stars, ArrowRight, Globe, Smile, Music2 } from 'lucide-react';
+import { Radio, Sparkles, Stars, ArrowRight, Globe, Smile, Music2, MessageCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
@@ -60,7 +59,7 @@ const Index = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="max-w-4xl mx-auto"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12">
               <div className="text-center p-4 sm:p-6">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
                   <Smile className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
@@ -88,6 +87,16 @@ const Index = () => {
                 <h3 className="text-lg sm:text-xl font-semibold mb-3">{t('features.platformFree')}</h3>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                   {t('features.platformFreeDesc')}
+                </p>
+              </div>
+
+              <div className="text-center p-4 sm:p-6">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <MessageCircle className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold mb-3">AI Music Assistant</h3>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                  Chat with our AI assistant anytime — get music recommendations, explore genres, or ask anything about your vibe.
                 </p>
               </div>
             </div>

@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Radio, Sparkles, Stars, ArrowRight, Globe, Smile, Music2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import MusicDiscoveryWidget from '@/components/features/MusicDiscoveryWidget';
+
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {

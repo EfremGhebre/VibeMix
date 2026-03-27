@@ -97,7 +97,6 @@ const Index = ({ onOpenChat }: IndexProps) => {
               <motion.div
                 className="text-center p-4 sm:p-6 rounded-2xl cursor-pointer group relative overflow-hidden transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/10 border border-transparent hover:border-primary/20"
                 onClick={onOpenChat}
-                whileHover={{ scale: 1.03, y: -4 }}
                 whileTap={{ scale: 0.98 }}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

@@ -105,7 +105,7 @@ const Index = ({ onOpenChat }: IndexProps) => {
                   <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                     <MessageCircle className="h-6 w-6 sm:h-8 sm:w-8 text-primary group-hover:scale-110 transition-transform" />
                   </div>
-                  <h3 className="text-lg sm:text-xl font-semibold mb-3 group-hover:text-primary transition-colors">AI Music Assistant</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-3">AI Music Assistant</h3>
                   <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                     Chat with our AI assistant anytime — get help, explore features, or find your perfect vibe.
                   </p>

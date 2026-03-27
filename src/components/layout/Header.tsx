@@ -60,23 +60,23 @@ export default function Header() {
           <h1 className="text-lg sm:text-xl font-bold gradient-text">{t('app.name')}</h1>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className={`hidden lg:flex items-center space-x-1 ${isRTL ? 'space-x-reverse' : ''}`}>
-          <Link to="/" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary inline-flex items-center justify-center">
-            {t('nav.home')}
-          </Link>
-          <Link to="/discover" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary inline-flex items-center justify-center">
-            {t('nav.discover')}
-          </Link>
-          {user && (
+        {/* Desktop Navigation - only show when logged in */}
+        {user && (
+          <nav className={`hidden lg:flex items-center space-x-1 ${isRTL ? 'space-x-reverse' : ''}`}>
+            <Link to="/" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary inline-flex items-center justify-center">
+              {t('nav.home')}
+            </Link>
+            <Link to="/discover" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary inline-flex items-center justify-center">
+              {t('nav.discover')}
+            </Link>
             <Link to="/playlists" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary inline-flex items-center justify-center">
               {t('nav.savedVibes')}
             </Link>
-          )}
-          <Link to="/settings" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary inline-flex items-center justify-center">
-            {t('nav.settings')}
-          </Link>
-        </nav>
+            <Link to="/settings" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary inline-flex items-center justify-center">
+              {t('nav.settings')}
+            </Link>
+          </nav>
+        )}
 
         {/* Desktop Controls */}
         <div className={`hidden lg:flex items-center space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>

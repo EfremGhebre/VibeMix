@@ -1,17 +1,9 @@
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Radio, Headphones, Stars, ArrowRight, Target, Palette, Globe, Smile, Snowflake, Zap } from 'lucide-react';
+import { Radio, Sparkles, Stars, ArrowRight, Globe, Smile, Music2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import MoodCard from '@/components/mood/MoodCard';
-import MusicDiscoveryWidget from '@/components/features/MusicDiscoveryWidget';
-import { SpotifyConnectButton } from '@/components/spotify/SpotifyConnectButton';
-import { useNavigate } from 'react-router-dom';
 
-const featuredMoods = [
-  { slug: 'happy', icon: Smile, labelKey: 'mood.happy' },
-  { slug: 'chill', icon: Snowflake, labelKey: 'mood.chill' },
-  { slug: 'energetic', icon: Zap, labelKey: 'mood.energetic' },
-];
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const { t } = useLanguage();
@@ -40,15 +32,11 @@ const Index = () => {
             </div>
             
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold gradient-text mb-6 leading-tight px-4">
-              {t('app.name')}
+              {t('hero.headline')}
             </h1>
             
-            <p className="text-lg sm:text-xl lg:text-2xl text-primary font-semibold mb-4 px-4">
-              {t('app.tagline')}
-            </p>
-            
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed px-4">
-              {t('app.description')}
+              {t('hero.description')}
             </p>
           </motion.div>
 
@@ -59,8 +47,8 @@ const Index = () => {
             className="mb-12 sm:mb-16"
           >
             <Button onClick={handleGetStarted} className="hero-button text-base sm:text-lg group h-12 sm:h-14 px-6 sm:px-8">
-              <Headphones className="mr-2 sm:mr-3 h-5 w-5 group-hover:animate-bounce" />
-              {t('hero.startJourney')}
+              <Sparkles className="mr-2 sm:mr-3 h-5 w-5 group-hover:animate-bounce" />
+              {t('hero.cta')}
               <ArrowRight className="ml-2 sm:ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </motion.div>
@@ -72,14 +60,14 @@ const Index = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="max-w-4xl mx-auto"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12">
               <div className="text-center p-4 sm:p-6">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
-                  <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+                  <Smile className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold mb-3">{t('features.instantPlaylist')}</h3>
+                <h3 className="text-lg sm:text-xl font-semibold mb-3">{t('features.moodBased')}</h3>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  {t('features.instantPlaylistDesc')}
+                  {t('features.moodBasedDesc')}
                 </p>
               </div>
 
@@ -87,9 +75,19 @@ const Index = () => {
                 <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl bg-secondary/10 flex items-center justify-center">
                   <Globe className="h-6 w-6 sm:h-8 sm:w-8 text-secondary" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold mb-3">{t('features.globalMusic')}</h3>
+                <h3 className="text-lg sm:text-xl font-semibold mb-3">{t('features.multiLanguage')}</h3>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  {t('features.globalMusicDesc')}
+                  {t('features.multiLanguageDesc')}
+                </p>
+              </div>
+
+              <div className="text-center p-4 sm:p-6">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl bg-accent/10 flex items-center justify-center">
+                  <Music2 className="h-6 w-6 sm:h-8 sm:w-8 text-accent" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold mb-3">{t('features.platformFree')}</h3>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                  {t('features.platformFreeDesc')}
                 </p>
               </div>
             </div>
@@ -102,37 +100,20 @@ const Index = () => {
               
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                 <Button onClick={handleGetStarted} size="lg" className="text-sm sm:text-base h-12 sm:h-14">
-                  <Headphones className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  {t('hero.exploreMusic')}
+                  <Sparkles className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  {t('hero.cta')}
                 </Button>
                 <Button variant="outline" size="lg" className="text-sm sm:text-base h-12 sm:h-14" onClick={() => {
-                  const element = document.getElementById('music-discovery');
+                  const element = document.getElementById('how-it-works');
                   element?.scrollIntoView({ behavior: 'smooth' });
                 }}>
                   <Stars className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  {t('hero.tryDemo')}
+                  {t('hero.learnMore')}
                 </Button>
-                <SpotifyConnectButton variant="secondary" size="lg" className="text-sm sm:text-base h-12 sm:h-14" />
               </div>
             </div>
           </motion.div>
         </div>
-      </section>
-
-      {/* Interactive Music Discovery Section */}
-      <section id="music-discovery" className="container mx-auto px-4 py-12 sm:py-20 border-t border-border/40">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-6">{t('experience.title')}</h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            {t('experience.subtitle')}
-          </p>
-          <MusicDiscoveryWidget />
-        </motion.div>
       </section>
 
       {/* How It Works Section */}
@@ -150,78 +131,25 @@ const Index = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/10 flex items-center justify-center text-2xl font-bold text-green-500">
-                1
-              </div>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">1</div>
               <h3 className="text-xl font-semibold mb-3">{t('howItWorks.step1')}</h3>
-              <p className="text-muted-foreground">
-                {t('howItWorks.step1Desc')}
-              </p>
+              <p className="text-muted-foreground">{t('howItWorks.step1Desc')}</p>
             </div>
-            
             <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
-                2
-              </div>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary/10 flex items-center justify-center text-2xl font-bold text-secondary">2</div>
               <h3 className="text-xl font-semibold mb-3">{t('howItWorks.step2')}</h3>
-              <p className="text-muted-foreground">
-                {t('howItWorks.step2Desc')}
-              </p>
+              <p className="text-muted-foreground">{t('howItWorks.step2Desc')}</p>
             </div>
-            
             <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary/10 flex items-center justify-center text-2xl font-bold text-secondary">
-                3
-              </div>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/10 flex items-center justify-center text-2xl font-bold text-accent">3</div>
               <h3 className="text-xl font-semibold mb-3">{t('howItWorks.step3')}</h3>
-              <p className="text-muted-foreground">
-                {t('howItWorks.step3Desc')}
-              </p>
+              <p className="text-muted-foreground">{t('howItWorks.step3Desc')}</p>
             </div>
-            
             <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/10 flex items-center justify-center text-2xl font-bold text-accent">
-                4
-              </div>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">4</div>
               <h3 className="text-xl font-semibold mb-3">{t('howItWorks.step4')}</h3>
-              <p className="text-muted-foreground">
-                {t('howItWorks.step4Desc')}
-              </p>
+              <p className="text-muted-foreground">{t('howItWorks.step4Desc')}</p>
             </div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Features Section */}
-      <section className="container mx-auto px-4 py-12 sm:py-20 border-t border-border/40">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto"
-        >
-          <div className="text-center p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40 hover:border-primary/30 transition-colors">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Target className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-            </div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('features.moodBased')}</h3>
-            <p className="text-sm sm:text-base text-muted-foreground">{t('features.moodBasedDesc')}</p>
-          </div>
-
-          <div className="text-center p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40 hover:border-secondary/30 transition-colors">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 rounded-xl bg-secondary/10 flex items-center justify-center">
-              <Palette className="h-5 w-5 sm:h-6 sm:w-6 text-secondary" />
-            </div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('features.multiGenre')}</h3>
-            <p className="text-sm sm:text-base text-muted-foreground">{t('features.multiGenreDesc')}</p>
-          </div>
-
-          <div className="text-center p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-surface to-surface-elevated border border-border/40 hover:border-accent/30 transition-colors">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 rounded-xl bg-accent/10 flex items-center justify-center">
-              <Globe className="h-5 w-5 sm:h-6 sm:w-6 text-accent" />
-            </div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('features.multiLanguage')}</h3>
-            <p className="text-sm sm:text-base text-muted-foreground">{t('features.multiLanguageDesc')}</p>
           </div>
         </motion.div>
       </section>

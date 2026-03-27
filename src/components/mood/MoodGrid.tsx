@@ -10,22 +10,24 @@ import {
   Zap, 
   Heart, 
   Crown, 
-  Leaf, 
   Music, 
-  CloudRain 
+  CloudRain,
+  Car,
+  Sun,
+  Flame
 } from 'lucide-react';
 
 const moods: Mood[] = [
   { slug: 'happy', icon: Smile, labelKey: 'mood.happy' },
   { slug: 'chill', icon: Snowflake, labelKey: 'mood.chill' },
-  { slug: 'focus', icon: Target, labelKey: 'mood.focus' },
   { slug: 'sad', icon: Cloud, labelKey: 'mood.sad' },
+  { slug: 'focus', icon: Target, labelKey: 'mood.focus' },
   { slug: 'energetic', icon: Zap, labelKey: 'mood.energetic' },
+  { slug: 'party', icon: Music, labelKey: 'mood.party' },
   { slug: 'romantic', icon: Heart, labelKey: 'mood.romantic' },
   { slug: 'confident', icon: Crown, labelKey: 'mood.confident' },
-  { slug: 'mellow', icon: Leaf, labelKey: 'mood.mellow' },
-  { slug: 'party', icon: Music, labelKey: 'mood.party' },
   { slug: 'rainy', icon: CloudRain, labelKey: 'mood.rainy' },
+  { slug: 'mellow', icon: Sun, labelKey: 'mood.mellow' },
 ];
 
 interface MoodGridProps {

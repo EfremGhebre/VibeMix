@@ -82,6 +82,98 @@ export type Database = {
         }
         Relationships: []
       }
+      generated_playlist_items: {
+        Row: {
+          album: string | null
+          apple_music_search_url: string | null
+          artist: string
+          created_at: string
+          energy_score: number | null
+          genre: string | null
+          id: string
+          language: string | null
+          mood_tags: string[]
+          playlist_id: string
+          position: number
+          spotify_search_url: string | null
+          title: string
+          youtube_music_search_url: string | null
+        }
+        Insert: {
+          album?: string | null
+          apple_music_search_url?: string | null
+          artist: string
+          created_at?: string
+          energy_score?: number | null
+          genre?: string | null
+          id?: string
+          language?: string | null
+          mood_tags?: string[]
+          playlist_id: string
+          position: number
+          spotify_search_url?: string | null
+          title: string
+          youtube_music_search_url?: string | null
+        }
+        Update: {
+          album?: string | null
+          apple_music_search_url?: string | null
+          artist?: string
+          created_at?: string
+          energy_score?: number | null
+          genre?: string | null
+          id?: string
+          language?: string | null
+          mood_tags?: string[]
+          playlist_id?: string
+          position?: number
+          spotify_search_url?: string | null
+          title?: string
+          youtube_music_search_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_playlist_items_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "generated_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generated_playlists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          mood: string
+          selected_filters: Json
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          mood: string
+          selected_filters?: Json
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          mood?: string
+          selected_filters?: Json
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       genres: {
         Row: {
           color: string | null
@@ -272,6 +364,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      saved_vibes: {
+        Row: {
+          id: string
+          playlist_id: string
+          saved_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          playlist_id: string
+          saved_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          playlist_id?: string
+          saved_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_vibes_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "generated_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       song_genres: {
         Row: {
@@ -534,10 +655,17 @@ export type Database = {
           audio_quality: string | null
           autoplay_enabled: boolean | null
           created_at: string
+          default_moods: string[] | null
+          energy_preference: number | null
           explicit_content_allowed: boolean | null
+          explicit_filter: boolean | null
+          favorite_genres: string[] | null
+          favorite_languages: string[] | null
           id: string
           language: string | null
           notifications_enabled: boolean | null
+          onboarding_completed: boolean | null
+          preferred_platform: string | null
           spotify_display_name: string | null
           spotify_user_id: string | null
           theme: string | null
@@ -548,10 +676,17 @@ export type Database = {
           audio_quality?: string | null
           autoplay_enabled?: boolean | null
           created_at?: string
+          default_moods?: string[] | null
+          energy_preference?: number | null
           explicit_content_allowed?: boolean | null
+          explicit_filter?: boolean | null
+          favorite_genres?: string[] | null
+          favorite_languages?: string[] | null
           id?: string
           language?: string | null
           notifications_enabled?: boolean | null
+          onboarding_completed?: boolean | null
+          preferred_platform?: string | null
           spotify_display_name?: string | null
           spotify_user_id?: string | null
           theme?: string | null
@@ -562,10 +697,17 @@ export type Database = {
           audio_quality?: string | null
           autoplay_enabled?: boolean | null
           created_at?: string
+          default_moods?: string[] | null
+          energy_preference?: number | null
           explicit_content_allowed?: boolean | null
+          explicit_filter?: boolean | null
+          favorite_genres?: string[] | null
+          favorite_languages?: string[] | null
           id?: string
           language?: string | null
           notifications_enabled?: boolean | null
+          onboarding_completed?: boolean | null
+          preferred_platform?: string | null
           spotify_display_name?: string | null
           spotify_user_id?: string | null
           theme?: string | null
@@ -579,10 +721,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_spotify_user_info: {
-        Args: { user_id_param?: string }
-        Returns: Json
-      }
+      get_spotify_user_info: { Args: { user_id_param?: string }; Returns: Json }
       has_spotify_connection: {
         Args: { user_id_param?: string }
         Returns: boolean

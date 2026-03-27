@@ -1,4 +1,4 @@
-import { Moon, Sun, Globe, Radio, LogIn, UserPlus, Menu, X, LogOut } from 'lucide-react';
+import { Moon, Sun, Globe, Radio, UserPlus, Menu, LogOut } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { 
@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useLanguage, type Language } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
@@ -42,16 +42,13 @@ export default function Header() {
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user) return;
-      
       const { data } = await supabase
         .from('profiles')
         .select('first_name, last_name')
         .eq('user_id', user.id)
         .single();
-      
       if (data) setProfileData(data);
     };
-
     fetchProfile();
   }, [user]);
 
@@ -63,48 +60,38 @@ export default function Header() {
           <h1 className="text-lg sm:text-xl font-bold gradient-text">{t('app.name')}</h1>
         </Link>
 
-        {/* Desktop Navigation - Only show when user is logged in */}
-        {user && (
-          <nav className={`hidden lg:flex items-center space-x-1 ${isRTL ? 'space-x-reverse' : ''}`}>
-            <Link to="/" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
-              {t('nav.home')}
+        {/* Desktop Navigation */}
+        <nav className={`hidden lg:flex items-center space-x-1 ${isRTL ? 'space-x-reverse' : ''}`}>
+          <Link to="/" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary inline-flex items-center justify-center">
+            {t('nav.home')}
+          </Link>
+          <Link to="/discover" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary inline-flex items-center justify-center">
+            {t('nav.discover')}
+          </Link>
+          {user && (
+            <Link to="/playlists" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary inline-flex items-center justify-center">
+              {t('nav.savedVibes')}
             </Link>
-            <Link to="/discover" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
-              {t('nav.discover')}
-            </Link>
-            <Link to="/playlists" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
-              {t('nav.myPlaylists')}
-            </Link>
-            <Link to="/settings" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-0 inline-flex items-center justify-center">
-              {t('nav.settings')}
-            </Link>
-          </nav>
-        )}
+          )}
+          <Link to="/settings" className="h-9 px-3 rounded-md text-sm font-medium transition-colors hover:text-primary inline-flex items-center justify-center">
+            {t('nav.settings')}
+          </Link>
+        </nav>
 
         {/* Desktop Controls */}
         <div className={`hidden lg:flex items-center space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
-          {/* Auth Section */}
           {user ? (
             <UserMenu />
           ) : (
-            <Button 
-              variant="default" 
-              size="sm" 
-              className="text-sm hover:text-primary transition-colors"
-              onClick={() => {
-                setAuthModalTab('signup');
-                setAuthModalOpen(true);
-              }}
-            >
+            <Button variant="default" size="sm" className="text-sm" onClick={() => { setAuthModalTab('signup'); setAuthModalOpen(true); }}>
               <UserPlus className="mr-2 h-4 w-4" />
               Get Started
             </Button>
           )}
 
-          {/* Language Selector */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0 hover:text-primary transition-colors">
+              <Button variant="ghost" size="sm" className="h-9 w-9 hover:text-primary">
                 <Globe className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -122,73 +109,43 @@ export default function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Theme Toggle */}
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0 hover:text-primary transition-colors"
-          >
+          <Button variant="ghost" size="sm" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="h-9 w-9 hover:text-primary">
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           </Button>
 
-          {/* Sign Out Button - Only show when logged in */}
           {user && (
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={signOut}
-          disabled={signingOut}
-          className="h-9 px-3 text-sm font-medium hover:text-primary hover:bg-transparent transition-colors inline-flex items-center justify-center disabled:opacity-50"
-        >
-          {signingOut ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-              Signing out...
-            </>
-          ) : (
-            <>
-              <LogOut className="mr-2 h-4 w-4" />
-              {t('auth.signOut')}
-            </>
-          )}
-        </Button>
+            <Button variant="ghost" size="sm" onClick={signOut} disabled={signingOut} className="h-9 px-3 text-sm hover:text-primary">
+              {signingOut ? (
+                <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />Signing out...</>
+              ) : (
+                <><LogOut className="mr-2 h-4 w-4" />{t('auth.signOut')}</>
+              )}
+            </Button>
           )}
         </div>
 
         {/* Mobile Controls */}
         <div className={`flex lg:hidden items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
-          {/* Theme Toggle */}
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0 hover:text-primary transition-colors"
-          >
+          <Button variant="ghost" size="sm" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="h-9 w-9 hover:text-primary">
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           </Button>
 
-          {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-9 w-9">
-                <Menu className="h-5 w-5" />
-              </Button>
+              <Button variant="ghost" size="sm" className="h-9 w-9"><Menu className="h-5 w-5" /></Button>
             </SheetTrigger>
             <SheetContent side={isRTL ? 'left' : 'right'} className="w-80 bg-background/95 backdrop-blur">
               <div className="flex flex-col space-y-6 mt-8">
-                {/* Language Selector */}
+                {/* Language */}
                 <div>
                   <h3 className="text-sm font-medium mb-3 text-muted-foreground">Language</h3>
                   <Select value={currentLanguage} onValueChange={changeLanguage}>
                     <SelectTrigger className="w-full h-12">
                       <SelectValue>
                         <div className="flex items-center">
-                          <span className="mr-3 text-lg">
-                            {languages.find(l => l.code === currentLanguage)?.flag}
-                          </span>
+                          <span className="mr-3 text-lg">{languages.find(l => l.code === currentLanguage)?.flag}</span>
                           {languages.find(l => l.code === currentLanguage)?.name}
                         </div>
                       </SelectValue>
@@ -206,88 +163,43 @@ export default function Header() {
                   </Select>
                 </div>
 
-                {/* Navigation - Only show when user is logged in */}
-                {user && (
-                  <div>
-                    <h3 className="text-sm font-medium mb-3 text-muted-foreground">Navigation</h3>
-                    <div className="grid grid-cols-1 gap-2">
-                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/'); setIsOpen(false); }}>
-                        {t('nav.home')}
-                      </Button>
-                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/discover'); setIsOpen(false); }}>
-                        {t('nav.discover')}
-                      </Button>
-                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/playlists'); setIsOpen(false); }}>
-                        {t('nav.myPlaylists')}
-                      </Button>
-                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/settings'); setIsOpen(false); }}>
-                        {t('nav.settings')}
-                      </Button>
-                    </div>
+                {/* Nav */}
+                <div>
+                  <h3 className="text-sm font-medium mb-3 text-muted-foreground">Navigation</h3>
+                  <div className="grid grid-cols-1 gap-2">
+                    <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/'); setIsOpen(false); }}>{t('nav.home')}</Button>
+                    <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/discover'); setIsOpen(false); }}>{t('nav.discover')}</Button>
+                    {user && (
+                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/playlists'); setIsOpen(false); }}>{t('nav.savedVibes')}</Button>
+                    )}
+                    <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/settings'); setIsOpen(false); }}>{t('nav.settings')}</Button>
                   </div>
-                )}
+                </div>
 
-                {/* Auth Section */}
+                {/* Auth */}
                 <div>
                   <h3 className="text-sm font-medium mb-3 text-muted-foreground">Account</h3>
                   {user ? (
                     <div className="space-y-3">
-                      <button 
-                        onClick={() => {
-                          navigate('/profile');
-                          setIsOpen(false);
-                        }}
+                      <button
+                        onClick={() => { navigate('/profile'); setIsOpen(false); }}
                         className="w-full flex items-center space-x-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer"
                       >
                         <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-medium">
-                            {profileData?.first_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
-                          </span>
+                          <span className="text-sm font-medium">{profileData?.first_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}</span>
                         </div>
                         <div className="text-left">
-                          <p className="text-sm font-medium">
-                            {profileData?.first_name && profileData?.last_name 
-                              ? `${profileData.first_name} ${profileData.last_name}`
-                              : user.email?.split('@')[0]}
-                          </p>
+                          <p className="text-sm font-medium">{profileData?.first_name && profileData?.last_name ? `${profileData.first_name} ${profileData.last_name}` : user.email?.split('@')[0]}</p>
                           <p className="text-xs text-muted-foreground">{user.email}</p>
                         </div>
                       </button>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-destructive hover:text-destructive"
-                        onClick={() => {
-                          signOut();
-                          setIsOpen(false);
-                        }}
-                        disabled={signingOut}
-                      >
-                        {signingOut ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-destructive mr-2"></div>
-                            Signing out...
-                          </>
-                        ) : (
-                          <>
-                            <LogOut className="mr-2 h-4 w-4" />
-                            {t('auth.signOut')}
-                          </>
-                        )}
+                      <Button variant="outline" className="w-full justify-start text-destructive hover:text-destructive" onClick={() => { signOut(); setIsOpen(false); }} disabled={signingOut}>
+                        {signingOut ? (<><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-destructive mr-2" />Signing out...</>) : (<><LogOut className="mr-2 h-4 w-4" />{t('auth.signOut')}</>)}
                       </Button>
                     </div>
                   ) : (
-                    <Button 
-                      variant="default" 
-                      size="lg" 
-                      className="h-12 w-full"
-                      onClick={() => {
-                        setAuthModalTab('signup');
-                        setAuthModalOpen(true);
-                        setIsOpen(false);
-                      }}
-                    >
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      Get Started
+                    <Button variant="default" size="lg" className="h-12 w-full" onClick={() => { setAuthModalTab('signup'); setAuthModalOpen(true); setIsOpen(false); }}>
+                      <UserPlus className="mr-2 h-4 w-4" />Get Started
                     </Button>
                   )}
                 </div>
@@ -297,12 +209,7 @@ export default function Header() {
         </div>
       </div>
       
-      {/* Auth Modal */}
-      <AuthModal 
-        isOpen={authModalOpen} 
-        onClose={() => setAuthModalOpen(false)} 
-        defaultTab={authModalTab}
-      />
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} defaultTab={authModalTab} />
     </header>
   );
 }

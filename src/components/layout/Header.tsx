@@ -163,18 +163,18 @@ export default function Header() {
                   </Select>
                 </div>
 
-                {/* Nav */}
-                <div>
-                  <h3 className="text-sm font-medium mb-3 text-muted-foreground">Navigation</h3>
-                  <div className="grid grid-cols-1 gap-2">
-                    <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/'); setIsOpen(false); }}>{t('nav.home')}</Button>
-                    <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/discover'); setIsOpen(false); }}>{t('nav.discover')}</Button>
-                    {user && (
+                {/* Nav - only show when logged in */}
+                {user && (
+                  <div>
+                    <h3 className="text-sm font-medium mb-3 text-muted-foreground">Navigation</h3>
+                    <div className="grid grid-cols-1 gap-2">
+                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/'); setIsOpen(false); }}>{t('nav.home')}</Button>
+                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/discover'); setIsOpen(false); }}>{t('nav.discover')}</Button>
                       <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/playlists'); setIsOpen(false); }}>{t('nav.savedVibes')}</Button>
-                    )}
-                    <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/settings'); setIsOpen(false); }}>{t('nav.settings')}</Button>
+                      <Button variant="ghost" className="justify-start h-12" onClick={() => { navigate('/settings'); setIsOpen(false); }}>{t('nav.settings')}</Button>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Auth */}
                 <div>

@@ -369,7 +369,7 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
                       Online
                     </Badge>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={handleCloseConversation} className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive" title="Close chat">
+                  <Button variant="ghost" size="sm" onClick={handleHeaderClose} className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive" title="Close chat">
                     <X className="h-4 w-4" />
                   </Button>
                 </div>

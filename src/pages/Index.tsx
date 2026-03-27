@@ -4,7 +4,11 @@ import { Radio, Sparkles, Stars, ArrowRight, Globe, Smile, Music2, MessageCircle
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 
-const Index = () => {
+interface IndexProps {
+  onOpenChat?: () => void;
+}
+
+const Index = ({ onOpenChat }: IndexProps) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
@@ -90,15 +94,26 @@ const Index = () => {
                 </p>
               </div>
 
-              <div className="text-center p-4 sm:p-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
-                  <MessageCircle className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+              <motion.div
+                className="text-center p-4 sm:p-6 rounded-2xl cursor-pointer group relative overflow-hidden transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/10 border border-transparent hover:border-primary/20"
+                onClick={onOpenChat}
+                whileHover={{ scale: 1.03, y: -4 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <MessageCircle className="h-6 w-6 sm:h-8 sm:w-8 text-primary group-hover:scale-110 transition-transform" />
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-3 group-hover:text-primary transition-colors">AI Music Assistant</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                    Chat with our AI assistant anytime — get help, explore features, or find your perfect vibe.
+                  </p>
+                  <span className="inline-flex items-center mt-3 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                    <MessageCircle className="h-3 w-3 mr-1" /> Click to chat
+                  </span>
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold mb-3">AI Music Assistant</h3>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Chat with our AI assistant anytime — get music recommendations, explore genres, or ask anything about your vibe.
-                </p>
-              </div>
+              </motion.div>
             </div>
 
             <div className="text-center max-w-2xl mx-auto px-4">

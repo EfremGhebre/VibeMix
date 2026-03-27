@@ -1,4 +1,3 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
@@ -10,160 +9,222 @@ const corsHeaders = {
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-// Input validation schema
-function validateGeneratePlaylistInput(data: any) {
-  if (!data || typeof data !== 'object') {
-    throw new Error('Request body must be an object');
-  }
+// Curated music database organized by mood, genre, and language
+const musicDatabase: Record<string, Array<{title: string; artist: string; album?: string; genre: string; language: string; energy_score: number; mood_tags: string[]}>> = {
+  // English tracks
+  'en': [
+    { title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours', genre: 'Pop', language: 'en', energy_score: 85, mood_tags: ['energetic', 'party', 'confident'] },
+    { title: 'Levitating', artist: 'Dua Lipa', album: 'Future Nostalgia', genre: 'Pop', language: 'en', energy_score: 88, mood_tags: ['happy', 'party', 'energetic'] },
+    { title: 'Stay With Me', artist: 'Sam Smith', album: 'In the Lonely Hour', genre: 'Pop', language: 'en', energy_score: 40, mood_tags: ['sad', 'romantic', 'mellow'] },
+    { title: 'Shape of You', artist: 'Ed Sheeran', album: '÷', genre: 'Pop', language: 'en', energy_score: 75, mood_tags: ['happy', 'romantic'] },
+    { title: 'Bohemian Rhapsody', artist: 'Queen', album: 'A Night at the Opera', genre: 'Rock', language: 'en', energy_score: 80, mood_tags: ['energetic', 'confident'] },
+    { title: 'Someone Like You', artist: 'Adele', album: '21', genre: 'Pop', language: 'en', energy_score: 35, mood_tags: ['sad', 'romantic', 'rainy'] },
+    { title: 'Uptown Funk', artist: 'Bruno Mars', album: 'Uptown Special', genre: 'Pop', language: 'en', energy_score: 95, mood_tags: ['happy', 'party', 'energetic'] },
+    { title: 'Thinking Out Loud', artist: 'Ed Sheeran', album: 'x', genre: 'Pop', language: 'en', energy_score: 45, mood_tags: ['romantic', 'mellow', 'chill'] },
+    { title: 'Lose Yourself', artist: 'Eminem', album: '8 Mile', genre: 'Hip-Hop', language: 'en', energy_score: 90, mood_tags: ['energetic', 'confident', 'focus'] },
+    { title: 'Watermelon Sugar', artist: 'Harry Styles', album: 'Fine Line', genre: 'Pop', language: 'en', energy_score: 72, mood_tags: ['happy', 'chill'] },
+    { title: 'Sunflower', artist: 'Post Malone', album: 'Spider-Man: Into the Spider-Verse', genre: 'Hip-Hop', language: 'en', energy_score: 65, mood_tags: ['chill', 'happy'] },
+    { title: 'drivers license', artist: 'Olivia Rodrigo', album: 'SOUR', genre: 'Pop', language: 'en', energy_score: 30, mood_tags: ['sad', 'rainy', 'romantic'] },
+    { title: 'Circles', artist: 'Post Malone', album: "Hollywood's Bleeding", genre: 'Pop', language: 'en', energy_score: 55, mood_tags: ['chill', 'mellow', 'sad'] },
+    { title: 'Bad Guy', artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP', genre: 'Pop', language: 'en', energy_score: 70, mood_tags: ['confident', 'party'] },
+    { title: 'Midnight City', artist: 'M83', album: 'Hurry Up, We\'re Dreaming', genre: 'Electronic', language: 'en', energy_score: 78, mood_tags: ['energetic', 'party'] },
+    { title: 'Weightless', artist: 'Marconi Union', album: 'Weightless', genre: 'Electronic', language: 'en', energy_score: 15, mood_tags: ['chill', 'focus', 'mellow'] },
+    { title: 'Redbone', artist: 'Childish Gambino', album: 'Awaken, My Love!', genre: 'R&B', language: 'en', energy_score: 50, mood_tags: ['chill', 'romantic', 'mellow'] },
+    { title: 'Electric Feel', artist: 'MGMT', album: 'Oracular Spectacular', genre: 'Indie', language: 'en', energy_score: 75, mood_tags: ['happy', 'energetic', 'party'] },
+    { title: 'All of Me', artist: 'John Legend', album: 'Love in the Future', genre: 'R&B', language: 'en', energy_score: 40, mood_tags: ['romantic', 'mellow'] },
+    { title: 'Stressed Out', artist: 'Twenty One Pilots', album: 'Blurryface', genre: 'Rock', language: 'en', energy_score: 65, mood_tags: ['focus', 'sad'] },
+    { title: 'Can\'t Stop the Feeling!', artist: 'Justin Timberlake', genre: 'Pop', language: 'en', energy_score: 90, mood_tags: ['happy', 'party', 'energetic'] },
+    { title: 'Lovely', artist: 'Billie Eilish & Khalid', genre: 'Pop', language: 'en', energy_score: 25, mood_tags: ['sad', 'rainy', 'mellow'] },
+    { title: 'Do I Wanna Know?', artist: 'Arctic Monkeys', genre: 'Rock', language: 'en', energy_score: 60, mood_tags: ['confident', 'chill'] },
+    { title: 'Night Changes', artist: 'One Direction', genre: 'Pop', language: 'en', energy_score: 50, mood_tags: ['romantic', 'happy', 'mellow'] },
+    { title: 'Lofi Study Beats', artist: 'ChilledCow', genre: 'Electronic', language: 'en', energy_score: 30, mood_tags: ['focus', 'chill', 'mellow'] },
+  ],
+  // Arabic tracks
+  'ar': [
+    { title: 'Bahebek Wahashteeni', artist: 'Amr Diab', genre: 'Pop', language: 'ar', energy_score: 55, mood_tags: ['romantic', 'happy'] },
+    { title: 'Tamally Maak', artist: 'Amr Diab', genre: 'Pop', language: 'ar', energy_score: 60, mood_tags: ['romantic', 'happy'] },
+    { title: 'Ah W Noss', artist: 'Nancy Ajram', genre: 'Pop', language: 'ar', energy_score: 80, mood_tags: ['happy', 'party', 'energetic'] },
+    { title: 'Enta Eih', artist: 'Nancy Ajram', genre: 'Pop', language: 'ar', energy_score: 50, mood_tags: ['romantic', 'sad'] },
+    { title: 'Ya Tabtab', artist: 'Nancy Ajram', genre: 'Pop', language: 'ar', energy_score: 85, mood_tags: ['happy', 'party'] },
+    { title: 'Habibi Ya Nour El Ain', artist: 'Amr Diab', genre: 'Pop', language: 'ar', energy_score: 70, mood_tags: ['romantic', 'happy'] },
+    { title: 'Baed Annak', artist: 'Amr Diab', genre: 'Pop', language: 'ar', energy_score: 40, mood_tags: ['sad', 'romantic', 'mellow'] },
+    { title: 'Ehsas Gdeed', artist: 'Elissa', genre: 'Pop', language: 'ar', energy_score: 55, mood_tags: ['romantic', 'mellow'] },
+    { title: 'Boshret Kheir', artist: 'Hussain Al Jassmi', genre: 'Pop', language: 'ar', energy_score: 90, mood_tags: ['happy', 'party', 'energetic'] },
+    { title: 'Ana Nebt', artist: 'Cairokee', genre: 'Rock', language: 'ar', energy_score: 75, mood_tags: ['energetic', 'confident'] },
+    { title: 'Kan Ya Makan', artist: 'Fairuz', genre: 'Classical', language: 'ar', energy_score: 30, mood_tags: ['chill', 'mellow', 'rainy'] },
+    { title: 'Nassam Alayna El Hawa', artist: 'Fairuz', genre: 'Classical', language: 'ar', energy_score: 35, mood_tags: ['romantic', 'chill', 'mellow'] },
+  ],
+  // Swedish tracks
+  'sv': [
+    { title: 'Jag är fri', artist: 'Laleh', genre: 'Pop', language: 'sv', energy_score: 70, mood_tags: ['happy', 'energetic', 'confident'] },
+    { title: 'Goliat', artist: 'Laleh', genre: 'Pop', language: 'sv', energy_score: 65, mood_tags: ['confident', 'focus'] },
+    { title: 'Vart du än går', artist: 'Håkan Hellström', genre: 'Rock', language: 'sv', energy_score: 60, mood_tags: ['romantic', 'happy'] },
+    { title: 'Känn ingen sorg', artist: 'Håkan Hellström', genre: 'Rock', language: 'sv', energy_score: 80, mood_tags: ['happy', 'energetic', 'party'] },
+    { title: 'En del av mitt hjärta', artist: 'Håkan Hellström', genre: 'Rock', language: 'sv', energy_score: 55, mood_tags: ['romantic', 'mellow'] },
+    { title: 'Ängeln i rummet', artist: 'Veronica Maggio', genre: 'Pop', language: 'sv', energy_score: 65, mood_tags: ['happy', 'romantic'] },
+    { title: 'Hela huset', artist: 'Veronica Maggio', genre: 'Pop', language: 'sv', energy_score: 60, mood_tags: ['chill', 'happy'] },
+    { title: 'Mitt lilla land', artist: 'Veronica Maggio', genre: 'Pop', language: 'sv', energy_score: 50, mood_tags: ['mellow', 'romantic'] },
+    { title: 'Din tid kommer', artist: 'Miriam Bryant', genre: 'Pop', language: 'sv', energy_score: 75, mood_tags: ['confident', 'energetic'] },
+    { title: 'Handen i fickan fast jag pekar', artist: 'Veronica Maggio', genre: 'Pop', language: 'sv', energy_score: 55, mood_tags: ['chill', 'happy', 'mellow'] },
+  ],
+  // Tigrinya tracks
+  'ti': [
+    { title: 'Hade Lbi', artist: 'Helen Meles', genre: 'Pop', language: 'ti', energy_score: 55, mood_tags: ['romantic', 'mellow'] },
+    { title: 'Tezarebeni', artist: 'Helen Meles', genre: 'Pop', language: 'ti', energy_score: 60, mood_tags: ['happy', 'romantic'] },
+    { title: 'Lomi Beal', artist: 'Bereket Mengisteab', genre: 'Pop', language: 'ti', energy_score: 65, mood_tags: ['happy', 'romantic'] },
+    { title: 'Awet N\'Hafash', artist: 'Yemane Barya', genre: 'Pop', language: 'ti', energy_score: 70, mood_tags: ['confident', 'energetic'] },
+    { title: 'Shikor', artist: 'Dehab Faytinga', genre: 'Pop', language: 'ti', energy_score: 75, mood_tags: ['energetic', 'party'] },
+    { title: 'Kemey Aley', artist: 'Abraham Afewerki', genre: 'Pop', language: 'ti', energy_score: 50, mood_tags: ['romantic', 'chill'] },
+    { title: 'Eritrea', artist: 'Wedi Tikabo', genre: 'Pop', language: 'ti', energy_score: 80, mood_tags: ['happy', 'energetic', 'confident'] },
+    { title: 'Adey', artist: 'Tsehaytu Beraki', genre: 'Pop', language: 'ti', energy_score: 45, mood_tags: ['mellow', 'romantic', 'sad'] },
+  ],
+  // Spanish tracks
+  'es': [
+    { title: 'Despacito', artist: 'Luis Fonsi', genre: 'Latin', language: 'es', energy_score: 80, mood_tags: ['happy', 'party', 'romantic'] },
+    { title: 'Vivir Mi Vida', artist: 'Marc Anthony', genre: 'Latin', language: 'es', energy_score: 90, mood_tags: ['happy', 'party', 'energetic'] },
+    { title: 'Bailando', artist: 'Enrique Iglesias', genre: 'Latin', language: 'es', energy_score: 85, mood_tags: ['party', 'happy', 'energetic'] },
+    { title: 'La Bicicleta', artist: 'Shakira & Carlos Vives', genre: 'Latin', language: 'es', energy_score: 78, mood_tags: ['happy', 'energetic'] },
+    { title: 'Recuérdame', artist: 'Various Artists', album: 'Coco', genre: 'Latin', language: 'es', energy_score: 40, mood_tags: ['sad', 'romantic', 'mellow'] },
+    { title: 'Malamente', artist: 'Rosalía', genre: 'Pop', language: 'es', energy_score: 72, mood_tags: ['confident', 'energetic'] },
+    { title: 'Ojos Así', artist: 'Shakira', genre: 'Latin', language: 'es', energy_score: 75, mood_tags: ['energetic', 'confident'] },
+    { title: 'Clandestino', artist: 'Manu Chao', genre: 'Latin', language: 'es', energy_score: 55, mood_tags: ['chill', 'mellow'] },
+  ],
+  // French tracks
+  'fr': [
+    { title: 'Alors on danse', artist: 'Stromae', genre: 'Electronic', language: 'fr', energy_score: 82, mood_tags: ['party', 'energetic'] },
+    { title: 'Formidable', artist: 'Stromae', genre: 'Pop', language: 'fr', energy_score: 50, mood_tags: ['sad', 'romantic'] },
+    { title: 'Je Veux', artist: 'Zaz', genre: 'Pop', language: 'fr', energy_score: 75, mood_tags: ['happy', 'energetic'] },
+    { title: 'La Vie en Rose', artist: 'Edith Piaf', genre: 'Classical', language: 'fr', energy_score: 40, mood_tags: ['romantic', 'mellow', 'chill'] },
+    { title: 'Tous les mêmes', artist: 'Stromae', genre: 'Pop', language: 'fr', energy_score: 65, mood_tags: ['confident', 'focus'] },
+    { title: 'Papaoutai', artist: 'Stromae', genre: 'Electronic', language: 'fr', energy_score: 80, mood_tags: ['energetic', 'party'] },
+    { title: 'Les Champs-Élysées', artist: 'Joe Dassin', genre: 'Pop', language: 'fr', energy_score: 60, mood_tags: ['happy', 'chill'] },
+    { title: 'Non, je ne regrette rien', artist: 'Edith Piaf', genre: 'Classical', language: 'fr', energy_score: 55, mood_tags: ['confident', 'mellow'] },
+  ],
+  // Hindi tracks
+  'hi': [
+    { title: 'Tum Hi Ho', artist: 'Arijit Singh', genre: 'Pop', language: 'hi', energy_score: 50, mood_tags: ['romantic', 'sad'] },
+    { title: 'Kal Ho Naa Ho', artist: 'Sonu Nigam', genre: 'Pop', language: 'hi', energy_score: 65, mood_tags: ['romantic', 'happy'] },
+    { title: 'Chaiyya Chaiyya', artist: 'Sukhwinder Singh', genre: 'Pop', language: 'hi', energy_score: 90, mood_tags: ['energetic', 'party', 'happy'] },
+    { title: 'Kabira', artist: 'Arijit Singh & Tochi Raina', genre: 'Pop', language: 'hi', energy_score: 55, mood_tags: ['romantic', 'chill'] },
+    { title: 'Tujhe Dekha Toh', artist: 'Kumar Sanu & Lata Mangeshkar', genre: 'Pop', language: 'hi', energy_score: 60, mood_tags: ['romantic', 'happy'] },
+    { title: 'Kun Faya Kun', artist: 'A.R. Rahman', genre: 'Pop', language: 'hi', energy_score: 35, mood_tags: ['chill', 'focus', 'mellow'] },
+    { title: 'Jai Ho', artist: 'A.R. Rahman', genre: 'Pop', language: 'hi', energy_score: 88, mood_tags: ['energetic', 'happy', 'confident'] },
+    { title: 'Channa Mereya', artist: 'Arijit Singh', genre: 'Pop', language: 'hi', energy_score: 45, mood_tags: ['sad', 'romantic', 'rainy'] },
+  ],
+};
 
+function validateInput(data: any) {
+  if (!data || typeof data !== 'object') throw new Error('Request body must be an object');
   const { mood, genres, languages, userId } = data;
+  if (!mood || typeof mood !== 'string') throw new Error('Mood is required');
+  if (!Array.isArray(languages) || languages.length === 0) throw new Error('Languages must be a non-empty array');
+  if (!userId || typeof userId !== 'string') throw new Error('User ID is required');
+  return { mood: mood.trim(), genres: genres || [], languages, userId: userId.trim() };
+}
 
-  if (!mood || typeof mood !== 'string' || mood.trim().length === 0) {
-    throw new Error('Mood is required and must be a non-empty string');
+function generatePlaylistTitle(mood: string, languages: string[]): string {
+  const langNames: Record<string, string> = {
+    en: 'English', ar: 'Arabic', sv: 'Swedish', ti: 'Tigrinya',
+    es: 'Spanish', fr: 'French', hi: 'Hindi',
+  };
+  const moodCapitalized = mood.charAt(0).toUpperCase() + mood.slice(1);
+  const langPart = languages.length <= 2
+    ? languages.map(l => langNames[l] || l).join(' & ')
+    : 'Multilingual';
+  return `${moodCapitalized} ${langPart} Mix`;
+}
+
+function generateDescription(mood: string): string {
+  const descriptions: Record<string, string> = {
+    happy: 'An uplifting collection of feel-good tracks to brighten your day.',
+    chill: 'Relaxing tunes to help you unwind and find your calm.',
+    sad: 'A reflective mix for when you need to feel and process emotions.',
+    focus: 'Concentration-boosting tracks to help you get in the zone.',
+    energetic: 'High-energy bangers to power your workout or adventure.',
+    romantic: 'Love songs and romantic melodies for those special moments.',
+    confident: 'Empowering tracks to boost your confidence and swagger.',
+    mellow: 'Soft, soothing music for a gentle and peaceful vibe.',
+    party: 'Dance-worthy hits to get the party started.',
+    rainy: 'Cozy tracks perfect for rainy days and quiet contemplation.',
+  };
+  return descriptions[mood] || `A curated mix to match your ${mood} mood.`;
+}
+
+function buildSearchUrl(title: string, artist: string, platform: 'spotify' | 'apple_music' | 'youtube_music'): string {
+  const query = encodeURIComponent(`${title} ${artist}`);
+  switch (platform) {
+    case 'spotify': return `https://open.spotify.com/search/${query}`;
+    case 'apple_music': return `https://music.apple.com/search?term=${query}`;
+    case 'youtube_music': return `https://www.youtube.com/results?search_query=${query}`;
   }
-
-  if (!Array.isArray(genres) || genres.length === 0) {
-    throw new Error('Genres must be a non-empty array');
-  }
-
-  if (!Array.isArray(languages) || languages.length === 0) {
-    throw new Error('Languages must be a non-empty array');
-  }
-
-  if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
-    throw new Error('User ID is required and must be a non-empty string');
-  }
-
-  // Validate each genre
-  for (const genre of genres) {
-    if (typeof genre !== 'string' || genre.trim().length === 0) {
-      throw new Error('All genres must be non-empty strings');
-    }
-  }
-
-  // Validate each language
-  for (const language of languages) {
-    if (typeof language !== 'string' || language.trim().length === 0) {
-      throw new Error('All languages must be non-empty strings');
-    }
-  }
-
-  return { mood: mood.trim(), genres, languages, userId: userId.trim() };
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Parse and validate input
     const requestData = await req.json();
-    const { mood, genres, languages, userId } = validateGeneratePlaylistInput(requestData);
-    
+    const { mood, genres, languages, userId } = validateInput(requestData);
     console.log('Generating playlist for:', { mood, genres, languages, userId });
 
-    // Create Supabase client
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get JWT token from Authorization header for secure token retrieval
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return new Response(
-        JSON.stringify({ error: 'Authentication required. Please log in.' }), 
-        { 
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+    // Collect all candidate tracks from selected languages
+    let candidates: typeof musicDatabase['en'] = [];
+    for (const lang of languages) {
+      const tracks = musicDatabase[lang] || [];
+      candidates = candidates.concat(tracks);
+    }
+    // If no candidates, fall back to English
+    if (candidates.length === 0) {
+      candidates = musicDatabase['en'] || [];
     }
 
-    // Get Spotify tokens securely using the get-spotify-tokens function
-    const { data: tokenData, error: tokenError } = await supabase.functions.invoke('get-spotify-tokens', {
-      headers: {
-        Authorization: authHeader,
-      },
+    // Score and filter tracks
+    const scored = candidates.map(track => {
+      let score = 0;
+      // Mood match is primary
+      if (track.mood_tags.includes(mood)) score += 50;
+      // Genre match
+      if (genres.length > 0 && genres.some((g: string) => track.genre.toLowerCase().includes(g.toLowerCase()))) score += 20;
+      // Energy alignment
+      const moodEnergy: Record<string, number> = {
+        happy: 75, chill: 30, sad: 25, focus: 35, energetic: 90,
+        romantic: 45, confident: 70, mellow: 25, party: 90, rainy: 30,
+      };
+      const targetEnergy = moodEnergy[mood] || 50;
+      const energyDiff = Math.abs(track.energy_score - targetEnergy);
+      score += Math.max(0, 30 - energyDiff);
+      // Add small random factor for diversity
+      score += Math.random() * 10;
+      return { ...track, score };
     });
 
-    if (tokenError) {
-      console.error('Error fetching Spotify tokens:', tokenError);
+    // Sort by score and pick top 15
+    scored.sort((a, b) => b.score - a.score);
+    const selected = scored.slice(0, 15);
+
+    if (selected.length === 0) {
       return new Response(
-        JSON.stringify({ error: 'Failed to retrieve Spotify tokens. Please reconnect your Spotify account.' }), 
-        { 
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
+        JSON.stringify({ error: 'No tracks found for your criteria. Try different options.' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    if (!tokenData || !tokenData.access_token) {
-      console.error('No Spotify access token found in response:', tokenData);
-      return new Response(
-        JSON.stringify({ error: 'Spotify not connected. Please connect your Spotify account first.' }), 
-        { 
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
+    const playlistTitle = generatePlaylistTitle(mood, languages);
+    const playlistDescription = generateDescription(mood);
 
-    // Build search query based on mood and genres
-    const genreQuery = genres.join(' OR genre:');
-    const moodKeywords = getMoodKeywords(mood);
-    const searchQuery = `genre:${genreQuery} ${moodKeywords}`;
-    
-    console.log('Spotify search query:', searchQuery);
-
-    // Search for tracks on Spotify
-    const spotifyResponse = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(searchQuery)}&type=track&limit=30&market=US`, {
-      headers: {
-        'Authorization': `Bearer ${tokenData.access_token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!spotifyResponse.ok) {
-      console.error('Spotify API error:', spotifyResponse.status, await spotifyResponse.text());
-      return new Response(
-        JSON.stringify({ error: 'Failed to search Spotify tracks' }), 
-        { 
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    const spotifyData = await spotifyResponse.json();
-    const tracks = spotifyData.tracks?.items || [];
-    
-    if (tracks.length === 0) {
-      return new Response(
-        JSON.stringify({ error: 'No tracks found for your criteria. Try different genres or mood.' }), 
-        { 
-          status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    // Filter and select best tracks (limit to 20)
-    const selectedTracks = tracks
-      .filter((track: any) => track.preview_url) // Only tracks with preview
-      .slice(0, 20);
-
-    // Create playlist name
-    const playlistName = `${mood.charAt(0).toUpperCase() + mood.slice(1)} ${genres.slice(0, 2).join(' & ')} Mix`;
-    const playlistDescription = `A ${mood} playlist featuring ${genres.join(', ')} music. Generated by VibeMix.`;
-
-    // Create playlist in database
+    // Save to generated_playlists table
     const { data: playlist, error: playlistError } = await supabase
-      .from('playlists')
+      .from('generated_playlists')
       .insert({
         user_id: userId,
-        title: playlistName,
+        title: playlistTitle,
         description: playlistDescription,
-        is_public: false,
+        mood,
+        selected_filters: { genres, languages },
       })
       .select()
       .single();
@@ -171,76 +232,66 @@ serve(async (req) => {
     if (playlistError) {
       console.error('Error creating playlist:', playlistError);
       return new Response(
-        JSON.stringify({ error: 'Failed to create playlist' }), 
-        { 
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
+        JSON.stringify({ error: 'Failed to save playlist' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Add tracks to playlist_songs table
-    const playlistSongs = selectedTracks.map((track: any, index: number) => ({
+    // Save playlist items
+    const items = selected.map((track, index) => ({
       playlist_id: playlist.id,
-      song_id: track.id, // Using Spotify ID as song_id for now
+      title: track.title,
+      artist: track.artist,
+      album: track.album || null,
+      genre: track.genre,
+      language: track.language,
+      energy_score: track.energy_score,
+      mood_tags: track.mood_tags,
       position: index + 1,
+      spotify_search_url: buildSearchUrl(track.title, track.artist, 'spotify'),
+      apple_music_search_url: buildSearchUrl(track.title, track.artist, 'apple_music'),
+      youtube_music_search_url: buildSearchUrl(track.title, track.artist, 'youtube_music'),
     }));
 
-    const { error: songsError } = await supabase
-      .from('playlist_songs')
-      .insert(playlistSongs);
+    const { error: itemsError } = await supabase
+      .from('generated_playlist_items')
+      .insert(items);
 
-    if (songsError) {
-      console.error('Error adding songs to playlist:', songsError);
-      // Don't fail the request, just log the error
+    if (itemsError) {
+      console.error('Error saving playlist items:', itemsError);
     }
 
-    console.log('Playlist created successfully:', playlist.id);
+    console.log('Playlist created:', playlist.id);
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         playlist: {
           id: playlist.id,
-          title: playlist.title,
-          description: playlist.description,
-          track_count: selectedTracks.length,
-          tracks: selectedTracks.map((track: any) => ({
-            id: track.id,
-            name: track.name,
-            artist: track.artists[0]?.name,
-            preview_url: track.preview_url,
-            duration_ms: track.duration_ms,
-          }))
-        }
-      }), 
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+          title: playlistTitle,
+          description: playlistDescription,
+          mood,
+          track_count: selected.length,
+          tracks: items.map(item => ({
+            title: item.title,
+            artist: item.artist,
+            album: item.album,
+            genre: item.genre,
+            language: item.language,
+            energy_score: item.energy_score,
+            mood_tags: item.mood_tags,
+            spotify_search_url: item.spotify_search_url,
+            apple_music_search_url: item.apple_music_search_url,
+            youtube_music_search_url: item.youtube_music_search_url,
+          })),
+        },
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-
   } catch (error) {
-    console.error('Error in generate-playlist function:', error);
+    console.error('Error:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }), 
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Internal server error' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
-
-function getMoodKeywords(mood: string): string {
-  const moodMap: { [key: string]: string } = {
-    happy: 'upbeat energetic positive cheerful',
-    sad: 'melancholic emotional slow ballad',
-    energetic: 'high-energy dance workout pump-up',
-    chill: 'relaxed ambient chill downtempo',
-    romantic: 'love romantic slow intimate',
-    focused: 'instrumental focus ambient electronic',
-    party: 'party dance upbeat celebration',
-    nostalgic: 'throwback classic vintage retro',
-  };
-  
-  return moodMap[mood] || 'popular';
-}

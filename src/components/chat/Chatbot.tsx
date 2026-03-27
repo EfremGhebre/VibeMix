@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -183,9 +183,17 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [currentNodeId, setCurrentNodeId] = useState<string>('root');
   const [history, setHistory] = useState<string[]>([]);
+
+  const resetChat = useCallback(() => {
+    setCurrentNodeId('root');
+    setHistory([]);
+    setMessages([]);
+    setIsTyping(false);
+  }, []);
 
   const showNode = (nodeId: string, userLabel?: string, pushFrom?: string) => {
     const node = SUPPORT_FLOW[nodeId];
@@ -204,9 +212,9 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
 
     setTimeout(() => {
       const actions = node.options.map(o => ({ id: o.id, text: o.label, action: o.id }));
-      // Always add "Start over" if not root
       if (nodeId !== 'root') {
         actions.push({ id: 'start', text: '↩ Start over', action: 'start' });
+        actions.push({ id: 'close_chat', text: '✕ Close chat', action: 'close_chat' });
       }
       setMessages(prev => [...prev, {
         id: `bot-${Date.now()}`,
@@ -224,9 +232,8 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
 
   useEffect(() => {
     if (!isOpen) return;
+    resetChat();
     const node = SUPPORT_FLOW['root'];
-    setCurrentNodeId('root');
-    setHistory([]);
     setMessages([{
       id: 'bot-root',
       text: `${node.title}\n\n${node.prompt}`,
@@ -234,17 +241,36 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
       timestamp: new Date(),
       quickActions: node.options.map(o => ({ id: o.id, text: o.label, action: o.id })),
     }]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [isOpen, resetChat]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleCloseWithThankYou = () => {
+    setShowThankYou(true);
+    setTimeout(() => {
+      setShowThankYou(false);
+      resetChat();
+      onToggle();
+    }, 3000);
+  };
+
   const handleQuickAction = (action: string) => {
     if (action === 'start') {
       showNode('root', '↩ Start over');
       setHistory([]);
+      return;
+    }
+
+    if (action === 'close_chat' || action === 'close') {
+      setMessages(prev => [...prev, {
+        id: `user-${Date.now()}`,
+        text: '✕ Close chat',
+        sender: 'user',
+        timestamp: new Date(),
+      }]);
+      handleCloseWithThankYou();
       return;
     }
 
@@ -275,7 +301,7 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
     if (picked.next) {
       showNode(picked.next, picked.label, currentNodeId);
     } else {
-      // Terminal leaf
+      // Terminal leaf — offer start over or close
       setMessages(prev => [
         ...prev,
         { id: `user-${Date.now()}`, text: picked.label, sender: 'user', timestamp: new Date() },
@@ -286,23 +312,15 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
           timestamp: new Date(),
           quickActions: [
             { id: 'start', text: '↩ Start over', action: 'start' },
-            { id: 'close', text: 'No thanks, close', action: 'close' },
+            { id: 'close', text: '✕ No thanks, close chat', action: 'close' },
           ],
         },
       ]);
     }
-
-    if (action === 'close') {
-      handleCloseConversation();
-    }
   };
 
-  const handleCloseConversation = () => {
-    setCurrentNodeId('root');
-    setHistory([]);
-    setMessages([]);
-    setIsTyping(false);
-    onToggle();
+  const handleHeaderClose = () => {
+    handleCloseWithThankYou();
   };
 
   const formatTime = (date: Date) => {
@@ -311,7 +329,44 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {/* Thank You Overlay */}
+      {showThankYou && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          className="fixed bottom-28 right-6 z-[60] sm:bottom-28 sm:right-6"
+        >
+          <Card className="w-72 shadow-2xl border-2 border-primary/30">
+            <CardContent className="p-6 text-center">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 300, delay: 0.1 }}
+                className="text-4xl mb-3"
+              >
+                🎵
+              </motion.div>
+              <h3 className="text-lg font-semibold mb-1">Thank you!</h3>
+              <p className="text-sm text-muted-foreground">
+                Glad I could help. Enjoy your vibes! 🎶
+              </p>
+              <motion.div
+                className="mt-3 h-1 bg-primary/20 rounded-full overflow-hidden"
+              >
+                <motion.div
+                  className="h-full bg-primary rounded-full"
+                  initial={{ width: '100%' }}
+                  animate={{ width: '0%' }}
+                  transition={{ duration: 3, ease: 'linear' }}
+                />
+              </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {isOpen && !showThankYou && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -332,7 +387,7 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
                     <Button variant="ghost" size="sm" onClick={() => setIsMinimized(false)} className="h-6 w-6 p-0 hover:bg-primary hover:text-primary-foreground hidden lg:inline-flex" title="Restore">
                       <Maximize2 className="h-3 w-3" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={handleCloseConversation} className="h-6 w-6 p-0 hover:bg-primary hover:text-primary-foreground" title="Close">
+                    <Button variant="ghost" size="sm" onClick={handleHeaderClose} className="h-6 w-6 p-0 hover:bg-primary hover:text-primary-foreground" title="Close">
                       <X className="h-3 w-3" />
                     </Button>
                   </div>
@@ -347,11 +402,11 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
                     <Bot className="h-5 w-5 text-primary" />
                     <CardTitle className="text-base sm:text-lg">VibeMix AI</CardTitle>
                     <Badge className="text-xs bg-primary/20 text-primary border-primary/30">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block mr-1 animate-pulse" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block mr-1 animate-pulse" />
                       Online
                     </Badge>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={handleCloseConversation} className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive" title="Close chat">
+                  <Button variant="ghost" size="sm" onClick={handleHeaderClose} className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive" title="Close chat">
                     <X className="h-4 w-4" />
                   </Button>
                 </div>

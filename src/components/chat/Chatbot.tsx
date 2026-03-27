@@ -350,7 +350,7 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
                     <Button variant="ghost" size="sm" onClick={() => setIsMinimized(false)} className="h-6 w-6 p-0 hover:bg-primary hover:text-primary-foreground hidden lg:inline-flex" title="Restore">
                       <Maximize2 className="h-3 w-3" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={handleCloseConversation} className="h-6 w-6 p-0 hover:bg-primary hover:text-primary-foreground" title="Close">
+                    <Button variant="ghost" size="sm" onClick={handleHeaderClose} className="h-6 w-6 p-0 hover:bg-primary hover:text-primary-foreground" title="Close">
                       <X className="h-3 w-3" />
                     </Button>
                   </div>

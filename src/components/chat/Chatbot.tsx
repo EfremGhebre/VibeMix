@@ -183,9 +183,17 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [currentNodeId, setCurrentNodeId] = useState<string>('root');
   const [history, setHistory] = useState<string[]>([]);
+
+  const resetChat = useCallback(() => {
+    setCurrentNodeId('root');
+    setHistory([]);
+    setMessages([]);
+    setIsTyping(false);
+  }, []);
 
   const showNode = (nodeId: string, userLabel?: string, pushFrom?: string) => {
     const node = SUPPORT_FLOW[nodeId];
@@ -204,9 +212,9 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
 
     setTimeout(() => {
       const actions = node.options.map(o => ({ id: o.id, text: o.label, action: o.id }));
-      // Always add "Start over" if not root
       if (nodeId !== 'root') {
         actions.push({ id: 'start', text: '↩ Start over', action: 'start' });
+        actions.push({ id: 'close_chat', text: '✕ Close chat', action: 'close_chat' });
       }
       setMessages(prev => [...prev, {
         id: `bot-${Date.now()}`,
@@ -224,9 +232,8 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
 
   useEffect(() => {
     if (!isOpen) return;
+    resetChat();
     const node = SUPPORT_FLOW['root'];
-    setCurrentNodeId('root');
-    setHistory([]);
     setMessages([{
       id: 'bot-root',
       text: `${node.title}\n\n${node.prompt}`,
@@ -234,17 +241,36 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
       timestamp: new Date(),
       quickActions: node.options.map(o => ({ id: o.id, text: o.label, action: o.id })),
     }]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [isOpen, resetChat]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleCloseWithThankYou = () => {
+    setShowThankYou(true);
+    setTimeout(() => {
+      setShowThankYou(false);
+      resetChat();
+      onToggle();
+    }, 3000);
+  };
+
   const handleQuickAction = (action: string) => {
     if (action === 'start') {
       showNode('root', '↩ Start over');
       setHistory([]);
+      return;
+    }
+
+    if (action === 'close_chat' || action === 'close') {
+      setMessages(prev => [...prev, {
+        id: `user-${Date.now()}`,
+        text: '✕ Close chat',
+        sender: 'user',
+        timestamp: new Date(),
+      }]);
+      handleCloseWithThankYou();
       return;
     }
 
@@ -275,7 +301,7 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
     if (picked.next) {
       showNode(picked.next, picked.label, currentNodeId);
     } else {
-      // Terminal leaf
+      // Terminal leaf — offer start over or close
       setMessages(prev => [
         ...prev,
         { id: `user-${Date.now()}`, text: picked.label, sender: 'user', timestamp: new Date() },
@@ -286,23 +312,15 @@ export default function Chatbot({ isOpen, onToggle }: ChatbotProps) {
           timestamp: new Date(),
           quickActions: [
             { id: 'start', text: '↩ Start over', action: 'start' },
-            { id: 'close', text: 'No thanks, close', action: 'close' },
+            { id: 'close', text: '✕ No thanks, close chat', action: 'close' },
           ],
         },
       ]);
     }
-
-    if (action === 'close') {
-      handleCloseConversation();
-    }
   };
 
-  const handleCloseConversation = () => {
-    setCurrentNodeId('root');
-    setHistory([]);
-    setMessages([]);
-    setIsTyping(false);
-    onToggle();
+  const handleHeaderClose = () => {
+    handleCloseWithThankYou();
   };
 
   const formatTime = (date: Date) => {

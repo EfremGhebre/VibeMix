@@ -114,6 +114,7 @@ const Index = ({ onOpenChat }: IndexProps) => {
                   </span>
                 </div>
               </motion.div>
+            </div>
 
             <div className="text-center max-w-2xl mx-auto px-4">
               <p className="text-base sm:text-lg text-muted-foreground mb-6 sm:mb-8 leading-relaxed">

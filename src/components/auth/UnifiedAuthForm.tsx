@@ -15,7 +15,9 @@ interface UnifiedAuthFormProps {
 }
 
 export default function UnifiedAuthForm({ onSuccess }: UnifiedAuthFormProps) {
-  const { signUp, signIn, loading } = useAuth();
+  const { signUp, signIn, resetPassword, loading } = useAuth();
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
   const { t } = useLanguage();
   const [isLogin, setIsLogin] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

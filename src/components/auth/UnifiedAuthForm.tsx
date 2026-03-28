@@ -164,6 +164,20 @@ export default function UnifiedAuthForm({ onSuccess }: UnifiedAuthFormProps) {
               </div>
             </div>
 
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="link"
+                className="px-0 text-xs text-muted-foreground hover:text-primary"
+                onClick={() => {
+                  setShowForgotPassword(true);
+                  setResetEmail(loginData.email);
+                }}
+              >
+                Forgot your password?
+              </Button>
+            </div>
+
             <Button
               type="submit"
               className="w-full"
@@ -182,6 +196,47 @@ export default function UnifiedAuthForm({ onSuccess }: UnifiedAuthFormProps) {
               )}
             </Button>
           </form>
+
+          {/* Forgot Password Modal */}
+          {showForgotPassword && (
+            <div className="mt-4 p-4 rounded-lg border bg-muted/50 space-y-3">
+              <p className="text-sm font-medium">Reset your password</p>
+              <p className="text-xs text-muted-foreground">Enter your email and we'll send you a reset link.</p>
+              <Input
+                type="email"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                placeholder="your@email.com"
+              />
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  className="flex-1"
+                  disabled={isSubmitting || !resetEmail}
+                  onClick={async () => {
+                    setIsSubmitting(true);
+                    const result = await resetPassword(resetEmail);
+                    if (result.success) {
+                      sonnerToast.success('Password reset email sent! Check your inbox.');
+                      setShowForgotPassword(false);
+                    } else {
+                      sonnerToast.error(result.error || 'Failed to send reset email');
+                    }
+                    setIsSubmitting(false);
+                  }}
+                >
+                  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send Reset Link'}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowForgotPassword(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
         ) : (
           <form onSubmit={handleSignupSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">

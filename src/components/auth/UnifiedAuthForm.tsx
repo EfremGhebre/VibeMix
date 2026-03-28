@@ -119,6 +119,7 @@ export default function UnifiedAuthForm({ onSuccess }: UnifiedAuthFormProps) {
       
       <CardContent>
         {isLogin ? (
+          <>
           <form onSubmit={handleLoginSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">{t('auth.email')}</Label>

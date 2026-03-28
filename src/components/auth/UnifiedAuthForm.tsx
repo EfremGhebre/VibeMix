@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast as sonnerToast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader2, Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -14,7 +15,9 @@ interface UnifiedAuthFormProps {
 }
 
 export default function UnifiedAuthForm({ onSuccess }: UnifiedAuthFormProps) {
-  const { signUp, signIn, loading } = useAuth();
+  const { signUp, signIn, resetPassword, loading } = useAuth();
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
   const { t } = useLanguage();
   const [isLogin, setIsLogin] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,6 +119,7 @@ export default function UnifiedAuthForm({ onSuccess }: UnifiedAuthFormProps) {
       
       <CardContent>
         {isLogin ? (
+          <>
           <form onSubmit={handleLoginSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">{t('auth.email')}</Label>
@@ -161,6 +165,20 @@ export default function UnifiedAuthForm({ onSuccess }: UnifiedAuthFormProps) {
               </div>
             </div>
 
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="link"
+                className="px-0 text-xs text-muted-foreground hover:text-primary"
+                onClick={() => {
+                  setShowForgotPassword(true);
+                  setResetEmail(loginData.email);
+                }}
+              >
+                Forgot your password?
+              </Button>
+            </div>
+
             <Button
               type="submit"
               className="w-full"
@@ -179,6 +197,48 @@ export default function UnifiedAuthForm({ onSuccess }: UnifiedAuthFormProps) {
               )}
             </Button>
           </form>
+
+          {/* Forgot Password Modal */}
+          {showForgotPassword && (
+            <div className="mt-4 p-4 rounded-lg border bg-muted/50 space-y-3">
+              <p className="text-sm font-medium">Reset your password</p>
+              <p className="text-xs text-muted-foreground">Enter your email and we'll send you a reset link.</p>
+              <Input
+                type="email"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                placeholder="your@email.com"
+              />
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  className="flex-1"
+                  disabled={isSubmitting || !resetEmail}
+                  onClick={async () => {
+                    setIsSubmitting(true);
+                    const result = await resetPassword(resetEmail);
+                    if (result.success) {
+                      sonnerToast.success('Password reset email sent! Check your inbox.');
+                      setShowForgotPassword(false);
+                    } else {
+                      sonnerToast.error(result.error || 'Failed to send reset email');
+                    }
+                    setIsSubmitting(false);
+                  }}
+                >
+                  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send Reset Link'}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowForgotPassword(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+          </>
         ) : (
           <form onSubmit={handleSignupSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">

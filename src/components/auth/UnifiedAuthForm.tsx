@@ -237,8 +237,8 @@ export default function UnifiedAuthForm({ onSuccess }: UnifiedAuthFormProps) {
               </div>
             </div>
           )}
+          </>
         ) : (
-          <form onSubmit={handleSignupSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name</Label>

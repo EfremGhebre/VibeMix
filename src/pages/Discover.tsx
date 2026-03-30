@@ -108,7 +108,7 @@ export default function Discover() {
     }
   };
 
-  const canGenerate = selectedMood && selectedLanguages.length > 0;
+  const canGenerate = selectedMood && selectedLanguage;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-surface-elevated">

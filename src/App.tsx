@@ -21,6 +21,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 

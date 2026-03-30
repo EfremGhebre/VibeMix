@@ -103,7 +103,7 @@ export default function Discover() {
       });
 
       // Redirect to Saved Vibes
-      navigate('/my-playlists');
+      navigate('/playlists');
     } catch (error) {
       console.error('Error generating playlist:', error);
       toast({ title: "Error", description: "Failed to generate mix. Please try again.", variant: "destructive" });

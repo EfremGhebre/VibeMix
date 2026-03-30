@@ -22,15 +22,11 @@ export default function Discover() {
   const navigate = useNavigate();
 
   const handleGenreToggle = (genre: string) => {
-    setSelectedGenres(prev => 
-      prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
-    );
+    setSelectedGenre(prev => prev === genre ? '' : genre);
   };
 
   const handleLanguageToggle = (languageCode: string) => {
-    setSelectedLanguages(prev => 
-      prev.includes(languageCode) ? prev.filter(l => l !== languageCode) : [...prev, languageCode]
-    );
+    setSelectedLanguage(prev => prev === languageCode ? '' : languageCode);
   };
 
   const handleGeneratePlaylist = async () => {

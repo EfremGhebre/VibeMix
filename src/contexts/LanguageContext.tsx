@@ -62,7 +62,7 @@ const translations: Record<string, Record<string, string>> = {
     "mood.party": "Party",
     "mood.rainy": "Rainy Day",
     "mood.select": "How are you feeling?",
-    "genre.select": "Pick your genres (optional)",
+    "genre.select": "Pick your genres",
     "language.select": "Choose your music language",
     "language.subtitle": "Mix languages or focus on one — discover music you love",
     "button.getStarted": "Get Started",

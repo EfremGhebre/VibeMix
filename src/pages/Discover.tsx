@@ -158,14 +158,14 @@ export default function Discover() {
               )}
             </Button>
             
-            {selectedMood && selectedLanguages.length > 0 && (
+            {selectedMood && selectedLanguage && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="text-xs sm:text-sm text-muted-foreground mt-4 px-4 leading-relaxed"
               >
                 {t('discover.readyGenerate')} <span className="text-primary font-medium capitalize">{selectedMood}</span> {t('discover.mixIn')}{' '}
-                <span className="text-secondary font-medium">{selectedLanguages.length} {selectedLanguages.length === 1 ? 'language' : 'languages'}</span>
+                <span className="text-secondary font-medium">1 language</span>
               </motion.p>
             )}
           </motion.div>

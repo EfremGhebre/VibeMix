@@ -13,8 +13,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 export default function Discover() {
   const [selectedMood, setSelectedMood] = useState<string>('');
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['en']);
+  const [selectedGenre, setSelectedGenre] = useState<string>('');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -22,15 +22,11 @@ export default function Discover() {
   const navigate = useNavigate();
 
   const handleGenreToggle = (genre: string) => {
-    setSelectedGenres(prev => 
-      prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
-    );
+    setSelectedGenre(prev => prev === genre ? '' : genre);
   };
 
   const handleLanguageToggle = (languageCode: string) => {
-    setSelectedLanguages(prev => 
-      prev.includes(languageCode) ? prev.filter(l => l !== languageCode) : [...prev, languageCode]
-    );
+    setSelectedLanguage(prev => prev === languageCode ? '' : languageCode);
   };
 
   const handleGeneratePlaylist = async () => {
@@ -52,10 +48,10 @@ export default function Discover() {
       return;
     }
 
-    if (selectedLanguages.length === 0) {
+    if (!selectedLanguage) {
       toast({
         title: "Select a language",
-        description: "Choose at least one music language for your mix.",
+        description: "Choose a music language for your mix.",
         variant: "destructive",
       });
       return;
@@ -67,8 +63,8 @@ export default function Discover() {
       const { data, error } = await supabase.functions.invoke('generate-playlist', {
         body: {
           mood: selectedMood,
-          genres: selectedGenres,
-          languages: selectedLanguages,
+          genres: selectedGenre ? [selectedGenre] : [],
+          languages: [selectedLanguage],
           userId: user.id,
         }
       });
@@ -112,7 +108,7 @@ export default function Discover() {
     }
   };
 
-  const canGenerate = selectedMood && selectedLanguages.length > 0;
+  const canGenerate = selectedMood && selectedLanguage;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-surface-elevated">
@@ -133,8 +129,8 @@ export default function Discover() {
 
         <div className="max-w-6xl mx-auto space-y-12 sm:space-y-16">
           <MoodGrid selectedMood={selectedMood} onMoodSelect={setSelectedMood} />
-          <LanguageFilter selectedLanguages={selectedLanguages} onLanguageToggle={handleLanguageToggle} />
-          <GenreFilter selectedGenres={selectedGenres} onGenreToggle={handleGenreToggle} />
+          <LanguageFilter selectedLanguages={selectedLanguage ? [selectedLanguage] : []} onLanguageToggle={handleLanguageToggle} />
+          <GenreFilter selectedGenres={selectedGenre ? [selectedGenre] : []} onGenreToggle={handleGenreToggle} />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -162,14 +158,14 @@ export default function Discover() {
               )}
             </Button>
             
-            {selectedMood && selectedLanguages.length > 0 && (
+            {selectedMood && selectedLanguage && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="text-xs sm:text-sm text-muted-foreground mt-4 px-4 leading-relaxed"
               >
                 {t('discover.readyGenerate')} <span className="text-primary font-medium capitalize">{selectedMood}</span> {t('discover.mixIn')}{' '}
-                <span className="text-secondary font-medium">{selectedLanguages.length} {selectedLanguages.length === 1 ? 'language' : 'languages'}</span>
+                <span className="text-secondary font-medium">1 language</span>
               </motion.p>
             )}
           </motion.div>

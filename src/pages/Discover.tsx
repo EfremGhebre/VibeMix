@@ -13,8 +13,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 export default function Discover() {
   const [selectedMood, setSelectedMood] = useState<string>('');
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['en']);
+  const [selectedGenre, setSelectedGenre] = useState<string>('');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();

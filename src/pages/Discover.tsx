@@ -48,10 +48,10 @@ export default function Discover() {
       return;
     }
 
-    if (selectedLanguages.length === 0) {
+    if (!selectedLanguage) {
       toast({
         title: "Select a language",
-        description: "Choose at least one music language for your mix.",
+        description: "Choose a music language for your mix.",
         variant: "destructive",
       });
       return;

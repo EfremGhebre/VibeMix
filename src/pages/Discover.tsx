@@ -37,7 +37,6 @@ export default function Discover() {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['en']);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPlaylist, setGeneratedPlaylist] = useState<GeneratedPlaylist | null>(null);
-  const [isSaved, setIsSaved] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
   const { user } = useAuth();

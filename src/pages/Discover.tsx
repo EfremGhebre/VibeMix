@@ -63,8 +63,8 @@ export default function Discover() {
       const { data, error } = await supabase.functions.invoke('generate-playlist', {
         body: {
           mood: selectedMood,
-          genres: selectedGenres,
-          languages: selectedLanguages,
+          genres: selectedGenre ? [selectedGenre] : [],
+          languages: [selectedLanguage],
           userId: user.id,
         }
       });

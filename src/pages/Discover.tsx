@@ -129,8 +129,8 @@ export default function Discover() {
 
         <div className="max-w-6xl mx-auto space-y-12 sm:space-y-16">
           <MoodGrid selectedMood={selectedMood} onMoodSelect={setSelectedMood} />
-          <LanguageFilter selectedLanguages={selectedLanguages} onLanguageToggle={handleLanguageToggle} />
-          <GenreFilter selectedGenres={selectedGenres} onGenreToggle={handleGenreToggle} />
+          <LanguageFilter selectedLanguages={selectedLanguage ? [selectedLanguage] : []} onLanguageToggle={handleLanguageToggle} />
+          <GenreFilter selectedGenres={selectedGenre ? [selectedGenre] : []} onGenreToggle={handleGenreToggle} />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}

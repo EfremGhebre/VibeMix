@@ -104,7 +104,7 @@ const translations: Record<string, Record<string, string>> = {
     "howItWorks.step2Desc": "Pick the music languages you want. English, Arabic, Swedish, Tigrinya, and more.",
     "howItWorks.step3": "Generate Your Mix",
     "howItWorks.step3Desc":
-      "VibeMix creates a curated playlist of 10-20 songs that match your mood and language preferences.",
+      "VibeMix creates a personalized mix based on your mood and selected language.",
     "howItWorks.step4": "Listen Anywhere",
     "howItWorks.step4Desc":
       "Open your mix in Spotify, Apple Music, or YouTube Music with one tap. No connection required.",
@@ -196,7 +196,7 @@ const translations: Record<string, Record<string, string>> = {
     "howItWorks.step2": "اختر اللغات",
     "howItWorks.step2Desc": "حدد لغات الموسيقى التي تريدها. عربي، إنجليزي، سويدي، تيغرينية والمزيد.",
     "howItWorks.step3": "أنشئ مزيجك",
-    "howItWorks.step3Desc": "VibeMix ينشئ قائمة تشغيل منسقة من 10-20 أغنية تناسب مزاجك وتفضيلاتك اللغوية.",
+    "howItWorks.step3Desc": "ينشئ VibeMix مزيجاً مخصصاً بناءً على مزاجك واللغة التي اخترتها.",
     "howItWorks.step4": "استمع في أي مكان",
     "howItWorks.step4Desc": "افتح مزيجك في Spotify أو Apple Music أو YouTube Music بنقرة واحدة.",
   },
@@ -290,7 +290,7 @@ const translations: Record<string, Record<string, string>> = {
     "howItWorks.step2Desc": "Välj vilka musikspråk du vill ha. Engelska, arabiska, svenska, tigrinja och mer.",
     "howItWorks.step3": "Generera din mix",
     "howItWorks.step3Desc":
-      "VibeMix skapar en kuraterad spellista med 10-20 låtar som matchar ditt humör och språkpreferenser.",
+      "VibeMix skapar en personlig mix baserad på ditt humör och det språk du valt.",
     "howItWorks.step4": "Lyssna var som helst",
     "howItWorks.step4Desc": "Öppna din mix i Spotify, Apple Music eller YouTube Music med ett tryck.",
   },

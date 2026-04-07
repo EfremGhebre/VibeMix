@@ -1,155 +1,42 @@
-# Security Implementation for Spotify Tokens
+# Security Notes
 
-## Overview
+## Current Scope
 
-This document explains the security measures implemented to address the warning about storing sensitive Spotify access tokens in the database.
+VibeMix currently uses:
 
-## Security Issues Addressed
+- `generate-playlist` (authenticated edge function)
+- `send-support-email` (public edge function)
 
-### 1. **Token Encryption at Rest**
-- All Spotify tokens are encrypted using PostgreSQL's `pgcrypto` extension
-- Each token is encrypted with a unique IV (Initialization Vector)
-- Encryption keys are derived from user ID + application secret
-- Tokens are never stored in plain text
+The previous Spotify OAuth token flow has been removed from both app code and deployed Supabase functions.
 
-### 2. **Row Level Security (RLS)**
-- Users can only access their own tokens
-- Strict RLS policies prevent cross-user data access
-- All database operations are authenticated
+## Data and Access Model
 
-### 3. **Token Rotation**
-- Automatic token refresh when expired
-- Rotation counter tracks token updates
-- Old tokens are securely deactivated
+- Users must be authenticated to generate and save playlists.
+- Playlist data is stored in Supabase tables and scoped per user in app queries.
+- Music is not streamed or hosted by VibeMix; platform links are opened externally.
 
-### 4. **Secure API Access**
-- Tokens are only accessible through secure edge functions
-- Client-side code never has direct access to raw tokens
-- All token operations go through authenticated endpoints
+## Edge Function Security
 
-## Implementation Details
+### `generate-playlist`
+- JWT verification is enabled in `supabase/config.toml`.
+- Uses service role key server-side only.
+- Validates request body fields (`mood`, `languages`, `userId`, optional `genres`).
 
-### Database Schema
-```sql
--- Encrypted token storage
-CREATE TABLE public.spotify_tokens (
-  id UUID PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id),
-  access_token_encrypted BYTEA NOT NULL,
-  access_token_iv BYTEA NOT NULL,
-  refresh_token_encrypted BYTEA NOT NULL,
-  refresh_token_iv BYTEA NOT NULL,
-  expires_at TIMESTAMP WITH TIME ZONE,
-  is_active BOOLEAN DEFAULT true
-);
-```
+### `send-support-email`
+- JWT verification is intentionally disabled to allow guest support requests.
+- Should include abuse controls (rate limits/CAPTCHA) at app or gateway level.
 
-### Security Functions
-- `encrypt_spotify_token()` - Encrypts tokens with unique IVs
-- `decrypt_spotify_token()` - Decrypts tokens for authenticated users only
-- `store_spotify_tokens()` - Securely stores encrypted tokens
-- `get_spotify_access_token()` - Returns decrypted token for API calls
-- `revoke_spotify_tokens()` - Securely deactivates tokens
-
-## Security Best Practices Implemented
-
-### 1. **Encryption**
-- ✅ Tokens encrypted at rest using AES encryption
-- ✅ Unique IV for each token
-- ✅ Key derivation from user context
-
-### 2. **Access Control**
-- ✅ RLS policies restrict access to user's own tokens
-- ✅ All functions require authentication
-- ✅ No direct database access from client
-
-### 3. **Token Management**
-- ✅ Automatic token refresh
-- ✅ Secure token revocation
-- ✅ Expired token cleanup
-
-### 4. **API Security**
-- ✅ Edge functions handle all token operations
-- ✅ JWT authentication required
-- ✅ No token exposure to client-side code
-
-## Environment Variables Required
+## Environment Variables
 
 ```bash
-# Supabase
 SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 SUPABASE_ANON_KEY=your_anon_key
-
-# Encryption (set in Supabase dashboard)
-app.encryption_key=your_encryption_key
 ```
 
-## Migration Instructions
+## Operational Checklist
 
-1. **Run the migration**:
-   ```bash
-   supabase db push
-   ```
-
-2. **Set encryption key** in Supabase dashboard:
-   - Go to Settings > Database
-   - Add custom configuration: `app.encryption_key = 'your-secret-key'`
-
-3. **Set environment variables** in Supabase dashboard:
-   - Go to Settings > Edge Functions
-   - Add all required environment variables
-
-## Security Monitoring
-
-### Recommended Monitoring
-- Monitor token rotation frequency
-- Alert on failed token refreshes
-- Track token usage patterns
-- Monitor for suspicious access patterns
-
-### Cleanup Procedures
-- Automatic cleanup of expired tokens (30+ days old)
-- Manual cleanup procedures for security incidents
-- Regular security audits
-
-## Incident Response
-
-### If tokens are compromised:
-1. Immediately revoke all user tokens using `revoke_spotify_tokens()`
-2. Force re-authentication for affected users
-3. Rotate encryption keys
-4. Monitor for unauthorized access
-
-### If database is compromised:
-1. All tokens are encrypted and unusable without encryption keys
-2. Encryption keys are stored separately from the database
-3. Immediate key rotation required
-4. Force re-authentication for all users
-
-## Compliance
-
-This implementation addresses:
-- ✅ **Data Protection**: Tokens encrypted at rest
-- ✅ **Access Control**: Strict RLS policies
-- ✅ **Audit Trail**: Token usage tracking
-- ✅ **Token Rotation**: Automatic refresh and rotation
-- ✅ **Secure Storage**: No plaintext token storage
-- ✅ **API Security**: Edge function protection
-
-## Testing
-
-### Security Tests
-1. Verify tokens are encrypted in database
-2. Test RLS policies prevent cross-user access
-3. Verify automatic token refresh works
-4. Test token revocation functionality
-5. Verify edge functions require authentication
-
-### Performance Tests
-1. Token encryption/decryption performance
-2. Edge function response times
-3. Database query performance with RLS
-4. Token refresh latency
-
-This implementation provides enterprise-grade security for Spotify token storage while maintaining usability and performance.
+1. Keep edge function secrets only in Supabase dashboard, not in frontend code.
+2. Review RLS policies for playlist-related tables after schema changes.
+3. Monitor edge function logs for abuse/spikes and failed auth patterns.
+4. Remove unused functions from Supabase when deprecating features.

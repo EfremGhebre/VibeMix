@@ -1,73 +1,56 @@
-# Welcome to your Lovable project
+# VibeMix - AI Playlist Intelligence
 
-## Project info
+VibeMix is a mood-based music discovery app that creates playlist recommendations and lets users open them in their preferred platform.
 
-**URL**: https://lovable.dev/projects/b912227f-bd6f-485b-9980-fd7815e79852
+## What VibeMix Does
 
-## How can I edit this code?
+VibeMix turns user intent into a quick listening path:
 
-There are several ways of editing your application.
+1. Choose mood
+2. Choose language
+3. (Optional) choose genre
+4. Generate a mix
+5. Open it in Spotify, Apple Music, or YouTube
 
-**Use Lovable**
+## Core Concept
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b912227f-bd6f-485b-9980-fd7815e79852) and start prompting.
+VibeMix is a discovery and recommendation layer, not a streaming service.
 
-Changes made via Lovable will be committed automatically to this repo.
+- Mood-first recommendations
+- Language-aware mixes
+- Fast, low-friction flow
+- Platform-agnostic output
 
-**Use your preferred IDE**
+## Current Product Behavior
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Playlists are generated inside VibeMix and saved as "Saved Vibes"
+- Users can open the generated mix context in external platforms
+- No platform account connection is required for this flow
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Features
 
-Follow these steps:
+- Mood-based playlist generation
+- Language-specific recommendations
+- Optional genre filtering
+- Smart playlist titles and descriptions
+- Open in Spotify / Apple Music / YouTube
+- Save generated mixes
+- Light/dark mode
+- Multi-language UI support
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
+## Tech Stack
 
 - Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- React + TypeScript
+- Tailwind CSS + shadcn/ui
+- Supabase
 
-## How can I deploy this project?
+## Important Notes
 
-Simply open [Lovable](https://lovable.dev/projects/b912227f-bd6f-485b-9980-fd7815e79852) and click on Share -> Publish.
+- VibeMix does not stream music
+- VibeMix does not host or store audio files
+- VibeMix currently does not require Spotify OAuth connection
 
-## Can I connect a custom domain to my Lovable project?
+## Status
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Active development - VibeMix v2 (AI Playlist Intelligence Layer)

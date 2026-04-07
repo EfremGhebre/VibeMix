@@ -51,10 +51,6 @@ CREATE TABLE public.spotify_tokens (
 - `get_spotify_access_token()` - Returns decrypted token for API calls
 - `revoke_spotify_tokens()` - Securely deactivates tokens
 
-### Edge Functions
-- `get-spotify-tokens` - Secure token retrieval with automatic refresh
-- `spotify-token` - Secure token storage during OAuth flow
-
 ## Security Best Practices Implemented
 
 ### 1. **Encryption**
@@ -85,10 +81,6 @@ SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 SUPABASE_ANON_KEY=your_anon_key
 
-# Spotify
-SPOTIFY_CLIENT_ID=your_spotify_client_id
-SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-
 # Encryption (set in Supabase dashboard)
 app.encryption_key=your_encryption_key
 ```
@@ -104,13 +96,7 @@ app.encryption_key=your_encryption_key
    - Go to Settings > Database
    - Add custom configuration: `app.encryption_key = 'your-secret-key'`
 
-3. **Deploy edge functions**:
-   ```bash
-   supabase functions deploy get-spotify-tokens
-   supabase functions deploy spotify-token
-   ```
-
-4. **Set environment variables** in Supabase dashboard:
+3. **Set environment variables** in Supabase dashboard:
    - Go to Settings > Edge Functions
    - Add all required environment variables
 

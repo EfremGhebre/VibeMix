@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Music, Plus, ExternalLink, RefreshCw, Trash2 } from 'lucide-react';
+import { Music, Plus, ExternalLink, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -25,8 +25,6 @@ export default function SavedVibesList() {
   const navigate = useNavigate();
   const [playlists, setPlaylists] = useState<SavedPlaylist[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [expandedItems, setExpandedItems] = useState<any[]>([]);
 
   useEffect(() => {
     if (user) fetchPlaylists();
@@ -57,21 +55,6 @@ export default function SavedVibesList() {
     }
   };
 
-  const handleExpand = async (playlistId: string) => {
-    if (expandedId === playlistId) {
-      setExpandedId(null);
-      setExpandedItems([]);
-      return;
-    }
-    const { data } = await supabase
-      .from('generated_playlist_items')
-      .select('*')
-      .eq('playlist_id', playlistId)
-      .order('position', { ascending: true });
-    setExpandedId(playlistId);
-    setExpandedItems(data || []);
-  };
-
   const handleDelete = async (playlistId: string) => {
     try {
       // Delete items first, then playlist
@@ -85,13 +68,14 @@ export default function SavedVibesList() {
     }
   };
 
-  const openInPlatform = (item: any, platform: string) => {
-    const urls: Record<string, string> = {
-      spotify: item.spotify_search_url,
-      apple_music: item.apple_music_search_url,
-      youtube_music: item.youtube_music_search_url,
+  const openPlaylistInPlatform = (playlistTitle: string, platform: 'spotify' | 'apple_music' | 'youtube_music') => {
+    const query = encodeURIComponent(playlistTitle);
+    const urls: Record<'spotify' | 'apple_music' | 'youtube_music', string> = {
+      spotify: `https://open.spotify.com/search/${query}`,
+      apple_music: `https://music.apple.com/search?term=${query}`,
+      youtube_music: `https://www.youtube.com/results?search_query=${query}`,
     };
-    if (urls[platform]) window.open(urls[platform], '_blank', 'noopener,noreferrer');
+    window.open(urls[platform], '_blank', 'noopener,noreferrer');
   };
 
   if (loading) {
@@ -138,10 +122,10 @@ export default function SavedVibesList() {
           <Card className="overflow-hidden hover:shadow-elevated transition-all">
             <CardContent className="p-5">
               <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 cursor-pointer" onClick={() => handleExpand(playlist.id)}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-lg text-foreground">{playlist.title}</h3>
-                    <Badge variant="secondary" className="capitalize text-xs">{playlist.mood}</Badge>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold text-lg text-foreground truncate">{playlist.title}</h3>
+                    <Badge variant="secondary" className="capitalize text-xs shrink-0">{playlist.mood}</Badge>
                   </div>
                   {playlist.description && (
                     <p className="text-sm text-muted-foreground mb-2">{playlist.description}</p>
@@ -153,52 +137,39 @@ export default function SavedVibesList() {
                     )}
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" className="text-destructive/60 hover:text-destructive" onClick={() => handleDelete(playlist.id)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-destructive/60 hover:text-destructive shrink-0"
+                  onClick={() => handleDelete(playlist.id)}
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
 
-              {/* Expanded track list */}
-              {expandedId === playlist.id && expandedItems.length > 0 && (
-                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-4 border-t border-border/40 pt-4">
-                  <div className="space-y-2 mb-4">
-                    {expandedItems.map((item, i) => (
-                      <div key={item.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 group">
-                        <span className="text-xs text-muted-foreground w-5 text-right font-mono">{i + 1}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{item.title}</p>
-                          <p className="text-xs text-muted-foreground truncate">{item.artist}</p>
-                        </div>
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openInPlatform(item, 'spotify')} title="Spotify">
-                            <ExternalLink className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => {
-                      const query = encodeURIComponent(playlist.title);
-                      window.open(`https://open.spotify.com/search/${query}`, '_blank');
-                    }}>
-                      <ExternalLink className="h-3 w-3 mr-1" /> Spotify
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => {
-                      const query = encodeURIComponent(playlist.title);
-                      window.open(`https://music.apple.com/search?term=${query}`, '_blank');
-                    }}>
-                      <ExternalLink className="h-3 w-3 mr-1" /> Apple Music
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => {
-                      const query = encodeURIComponent(playlist.title);
-                      window.open(`https://www.youtube.com/results?search_query=${query}`, '_blank');
-                    }}>
-                      <ExternalLink className="h-3 w-3 mr-1" /> YouTube
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
+              <div className="mt-4 pt-4 border-t border-border/40 flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openPlaylistInPlatform(playlist.title, 'spotify')}
+                >
+                  <ExternalLink className="h-3 w-3 mr-1" /> Spotify
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openPlaylistInPlatform(playlist.title, 'apple_music')}
+                >
+                  <ExternalLink className="h-3 w-3 mr-1" /> Apple Music
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openPlaylistInPlatform(playlist.title, 'youtube_music')}
+                >
+                  <ExternalLink className="h-3 w-3 mr-1" /> YouTube
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

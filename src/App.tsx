@@ -16,7 +16,6 @@ import Discover from "./pages/Discover";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import MyPlaylists from "./pages/MyPlaylists";
-import AuthCallback from "./pages/AuthCallback";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Help from "./pages/Help";
@@ -42,7 +41,6 @@ const AppContent = () => {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/help" element={<Help />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

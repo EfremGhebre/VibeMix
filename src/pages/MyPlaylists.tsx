@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import SavedVibesList from '@/components/playlist/SavedVibesList';
 import { useLanguage } from '@/contexts/LanguageContext';
 

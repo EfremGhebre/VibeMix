@@ -1,4 +1,4 @@
-import { Moon, Sun, Globe, Radio, UserPlus, Menu, LogOut } from 'lucide-react';
+import { Moon, Sun, Globe, Radio, UserPlus, Menu, LogOut, Heart, User } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { 
@@ -139,6 +139,17 @@ export default function Header() {
 
         {/* Mobile Controls */}
         <div className={`flex lg:hidden items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
+          {user && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 max-w-[145px] px-2 text-sm truncate"
+              onClick={() => navigate('/profile')}
+            >
+              {t('profile.hi')} {profileData?.first_name || user.email?.split('@')[0]}
+            </Button>
+          )}
+
           <Button variant="ghost" size="sm" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="h-9 w-9 hover:text-primary">
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -205,6 +216,22 @@ export default function Header() {
                           <p className="text-xs text-muted-foreground">{user.email}</p>
                         </div>
                       </button>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                        onClick={() => { navigate('/profile'); setIsOpen(false); }}
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        {t('auth.profile')}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                        onClick={() => { navigate('/favorites'); setIsOpen(false); }}
+                      >
+                        <Heart className="mr-2 h-4 w-4" />
+                        {t('favorites.title')}
+                      </Button>
                       <Button variant="outline" className="w-full justify-start text-destructive hover:text-destructive" onClick={() => { signOut(); setIsOpen(false); }} disabled={signingOut}>
                         {signingOut ? (<><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-destructive mr-2" />Signing out...</>) : (<><LogOut className="mr-2 h-4 w-4" />{t('auth.signOut')}</>)}
                       </Button>

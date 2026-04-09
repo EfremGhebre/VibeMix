@@ -169,6 +169,11 @@ export default function Profile() {
       .slice(0, 2);
   };
 
+  const displayName =
+    profileData.first_name && profileData.last_name
+      ? `${profileData.first_name} ${profileData.last_name}`
+      : profileData.first_name || user?.email?.split('@')[0] || 'User';
+
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -176,12 +181,12 @@ export default function Profile() {
           <Card>
             <CardContent className="pt-6">
               <User className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <h2 className="text-xl font-semibold mb-2">Please log in</h2>
+              <h2 className="text-xl font-semibold mb-2">{t('profile.loginRequired')}</h2>
               <p className="text-muted-foreground mb-4">
-                You need to be logged in to view your profile.
+                {t('profile.loginRequiredDesc')}
               </p>
               <Button onClick={() => navigate('/')}>
-                Go Home
+                {t('profile.goHome')}
               </Button>
             </CardContent>
           </Card>
@@ -197,7 +202,7 @@ export default function Profile() {
           <Card>
             <CardContent className="pt-6">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading profile...</p>
+              <p className="text-muted-foreground">{t('profile.loading')}</p>
             </CardContent>
           </Card>
         </div>
@@ -227,13 +232,14 @@ export default function Profile() {
                     </Avatar>
                   </div>
                   <CardTitle className="text-2xl">
-                    {profileData.first_name && profileData.last_name 
-                      ? `${profileData.first_name} ${profileData.last_name}`
-                      : profileData.first_name || user.email?.split('@')[0]}
+                    {displayName}
                   </CardTitle>
                   <CardDescription className="text-lg">
                     {user.email}
                   </CardDescription>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {`${t('profile.hi')} ${displayName}`}
+                  </p>
                 </CardHeader>
               </Card>
             </motion.div>
@@ -247,19 +253,19 @@ export default function Profile() {
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>Profile Information</CardTitle>
+                    <CardTitle>{t('profile.infoTitle')}</CardTitle>
                     <Button
                       variant={isEditing ? "outline" : "default"}
                       onClick={() => setIsEditing(!isEditing)}
                     >
-                      {isEditing ? 'Cancel' : 'Edit Profile'}
+                      {isEditing ? t('profile.cancel') : t('profile.edit')}
                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="first_name">First Name</Label>
+                      <Label htmlFor="first_name">{t('profile.firstName')}</Label>
                       <Input
                         id="first_name"
                         name="first_name"
@@ -269,7 +275,7 @@ export default function Profile() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="last_name">Last Name</Label>
+                      <Label htmlFor="last_name">{t('profile.lastName')}</Label>
                       <Input
                         id="last_name"
                         name="last_name"
@@ -281,7 +287,7 @@ export default function Profile() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t('profile.email')}</Label>
                     <Input
                       id="email"
                       value={user.email}
@@ -291,14 +297,14 @@ export default function Profile() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="bio">Bio</Label>
+                    <Label htmlFor="bio">{t('profile.bio')}</Label>
                     <Textarea
                       id="bio"
                       name="bio"
                       value={profileData.bio}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      placeholder="Tell us about yourself..."
+                      placeholder={t('profile.bioPlaceholder')}
                       rows={3}
                     />
                   </div>
@@ -310,7 +316,7 @@ export default function Profile() {
                         disabled={isLoading}
                         className="flex-1"
                       >
-                        {isLoading ? 'Saving...' : 'Save Changes'}
+                        {isLoading ? t('profile.saving') : t('profile.save')}
                       </Button>
                     </div>
                   )}
@@ -325,7 +331,7 @@ export default function Profile() {
           >
             <Card>
               <CardHeader>
-                <CardTitle>Account Actions</CardTitle>
+                <CardTitle>{t('profile.actionsTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -335,7 +341,7 @@ export default function Profile() {
                     onClick={() => navigate('/settings')}
                   >
                     <User className="mr-2 h-4 w-4" />
-                    Account Settings
+                    {t('profile.accountSettings')}
                   </Button>
                   <Button
                     variant="outline"
@@ -343,7 +349,7 @@ export default function Profile() {
                     onClick={signOut}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
+                    {t('profile.signOut')}
                   </Button>
                 </div>
               </CardContent>

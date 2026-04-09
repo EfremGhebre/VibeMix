@@ -5,9 +5,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Music, Plus, ExternalLink, Trash2 } from 'lucide-react';
+import { Music, Plus, ExternalLink, Trash2, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SavedPlaylist {
   id: string;
@@ -22,13 +23,30 @@ interface SavedPlaylist {
 export default function SavedVibesList() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [playlists, setPlaylists] = useState<SavedPlaylist[]>([]);
   const [loading, setLoading] = useState(true);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+
+  const favoritesStorageKey = user ? `vibemix-favorite-playlists:${user.id}` : 'vibemix-favorite-playlists:guest';
 
   useEffect(() => {
     if (user) fetchPlaylists();
   }, [user]);
+
+  useEffect(() => {
+    const storedFavorites = localStorage.getItem(favoritesStorageKey);
+    if (storedFavorites) {
+      try {
+        setFavoriteIds(JSON.parse(storedFavorites));
+      } catch {
+        setFavoriteIds([]);
+      }
+    } else {
+      setFavoriteIds([]);
+    }
+  }, [favoritesStorageKey]);
 
   const fetchPlaylists = async () => {
     if (!user) return;
@@ -76,6 +94,18 @@ export default function SavedVibesList() {
       youtube_music: `https://www.youtube.com/results?search_query=${query}`,
     };
     window.open(urls[platform], '_blank', 'noopener,noreferrer');
+  };
+
+  const toggleFavorite = (playlistId: string) => {
+    setFavoriteIds((prev) => {
+      const next = prev.includes(playlistId) ? prev.filter((id) => id !== playlistId) : [...prev, playlistId];
+      localStorage.setItem(favoritesStorageKey, JSON.stringify(next));
+      toast({
+        title: prev.includes(playlistId) ? t('favorites.removedTitle') : t('favorites.savedTitle'),
+        description: prev.includes(playlistId) ? t('favorites.removedDesc') : t('favorites.savedDesc'),
+      });
+      return next;
+    });
   };
 
   if (loading) {
@@ -137,6 +167,15 @@ export default function SavedVibesList() {
                     )}
                   </div>
                 </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`shrink-0 ${favoriteIds.includes(playlist.id) ? 'text-rose-500 hover:text-rose-600' : 'text-muted-foreground hover:text-rose-500'}`}
+                  onClick={() => toggleFavorite(playlist.id)}
+                  aria-label={favoriteIds.includes(playlist.id) ? t('favorites.removeFromFavorites') : t('favorites.addToFavorites')}
+                >
+                  <Heart className={`h-4 w-4 ${favoriteIds.includes(playlist.id) ? 'fill-current' : ''}`} />
+                </Button>
                 <Button
                   variant="ghost"
                   size="icon"

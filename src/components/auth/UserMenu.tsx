@@ -4,7 +4,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { User, Settings, LogOut, Music, Heart } from 'lucide-react';
+import { User, Settings, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 export default function UserMenu() {
   const {
@@ -34,7 +34,7 @@ export default function UserMenu() {
   };
   const getGreeting = () => {
     const fullName = getFullName();
-    return `Hi, ${fullName}!`;
+    return `${t('profile.hi')}, ${fullName}!`;
   };
   return <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -42,7 +42,7 @@ export default function UserMenu() {
           <Avatar className="h-9 rounded-none w-auto min-w-fit">
             <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
             <AvatarFallback className="rounded-none bg-transparent px-2 w-auto text-sm">
-              Hi {getFirstName()}
+              {t('profile.hi')} {getFirstName()}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -65,7 +65,7 @@ export default function UserMenu() {
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate('/favorites')}>
           <Heart className="mr-2 h-4 w-4" />
-          <span>My Favorites</span>
+          <span>{t('favorites.title')}</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate('/settings')}>
           <Settings className="mr-2 h-4 w-4" />

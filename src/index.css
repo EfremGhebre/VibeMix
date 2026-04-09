@@ -210,6 +210,35 @@
   }
 }
 
+@layer utilities {
+  .reduce-motion *,
+  .reduce-motion *::before,
+  .reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .compact-view .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .compact-view .card-content-compact,
+  .compact-view [data-radix-collection-item],
+  .compact-view .mood-card {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .compact-view .mood-card {
+    padding: 1rem;
+  }
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }

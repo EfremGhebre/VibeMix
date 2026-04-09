@@ -1,34 +1,34 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { useLanguage, Language } from '@/contexts/LanguageContext';
+import { usePreferences } from '@/contexts/PreferencesContext';
 import { 
   Settings as SettingsIcon, 
   Palette, 
   Globe, 
   Monitor, 
   Bell, 
-  User,
   Sun,
   Moon,
   Laptop,
   Check
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
   const { currentLanguage, changeLanguage, t } = useLanguage();
-  const [notifications, setNotifications] = useState({
-    newPlaylists: true,
-    recommendations: false,
-    updates: true
-  });
+  const {
+    animationsEnabled,
+    compactView,
+    notifications,
+    setAnimationsEnabled,
+    setCompactView,
+    setNotificationPreference,
+  } = usePreferences();
 
   const themeOptions = [
     { value: 'light', label: t('theme.light'), icon: Sun },
@@ -58,7 +58,7 @@ export default function Settings() {
             </h1>
           </div>
           <p className="text-muted-foreground text-lg">
-            Customize your VibeMix experience
+            {t('settings.subtitle')}
           </p>
         </motion.div>
 
@@ -67,11 +67,11 @@ export default function Settings() {
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.1 }}>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Palette className="h-5 w-5 text-primary" />Appearance</CardTitle>
-                <CardDescription>Customize how VibeMix looks and feels</CardDescription>
+                <CardTitle className="flex items-center gap-2"><Palette className="h-5 w-5 text-primary" />{t('settings.appearance.title')}</CardTitle>
+                <CardDescription>{t('settings.appearance.description')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Label className="text-base font-medium mb-3 block">Theme</Label>
+                <Label className="text-base font-medium mb-3 block">{t('settings.appearance.theme')}</Label>
                 <div className="grid grid-cols-3 gap-3">
                   {themeOptions.map((option) => {
                     const Icon = option.icon;
@@ -98,11 +98,11 @@ export default function Settings() {
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Globe className="h-5 w-5 text-secondary" />Language & Region</CardTitle>
-                <CardDescription>Select your preferred app language</CardDescription>
+                <CardTitle className="flex items-center gap-2"><Globe className="h-5 w-5 text-secondary" />{t('settings.language.title')}</CardTitle>
+                <CardDescription>{t('settings.language.description')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Label className="text-base font-medium mb-3 block">Interface Language</Label>
+                <Label className="text-base font-medium mb-3 block">{t('settings.language.interface')}</Label>
                 <div className="grid gap-2">
                   {languageOptions.map((option) => (
                     <button
@@ -128,32 +128,41 @@ export default function Settings() {
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.3 }}>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Bell className="h-5 w-5 text-primary" />Notifications</CardTitle>
-                <CardDescription>Manage your notification preferences</CardDescription>
+                <CardTitle className="flex items-center gap-2"><Bell className="h-5 w-5 text-primary" />{t('settings.notifications.title')}</CardTitle>
+                <CardDescription>{t('settings.notifications.description')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">New Mixes</Label>
-                    <div className="text-sm text-muted-foreground">Get notified when new curated mixes are available</div>
+                    <Label className="text-base">{t('settings.notifications.newMixes')}</Label>
+                    <div className="text-sm text-muted-foreground">{t('settings.notifications.newMixesDesc')}</div>
                   </div>
-                  <Switch checked={notifications.newPlaylists} onCheckedChange={(checked) => setNotifications(prev => ({ ...prev, newPlaylists: checked }))} />
+                  <Switch
+                    checked={notifications.newPlaylists}
+                    onCheckedChange={(checked) => setNotificationPreference('newPlaylists', checked)}
+                  />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">Music Recommendations</Label>
-                    <div className="text-sm text-muted-foreground">Receive personalized music suggestions</div>
+                    <Label className="text-base">{t('settings.notifications.recommendations')}</Label>
+                    <div className="text-sm text-muted-foreground">{t('settings.notifications.recommendationsDesc')}</div>
                   </div>
-                  <Switch checked={notifications.recommendations} onCheckedChange={(checked) => setNotifications(prev => ({ ...prev, recommendations: checked }))} />
+                  <Switch
+                    checked={notifications.recommendations}
+                    onCheckedChange={(checked) => setNotificationPreference('recommendations', checked)}
+                  />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">App Updates</Label>
-                    <div className="text-sm text-muted-foreground">Stay informed about new features</div>
+                    <Label className="text-base">{t('settings.notifications.updates')}</Label>
+                    <div className="text-sm text-muted-foreground">{t('settings.notifications.updatesDesc')}</div>
                   </div>
-                  <Switch checked={notifications.updates} onCheckedChange={(checked) => setNotifications(prev => ({ ...prev, updates: checked }))} />
+                  <Switch
+                    checked={notifications.updates}
+                    onCheckedChange={(checked) => setNotificationPreference('updates', checked)}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -163,24 +172,30 @@ export default function Settings() {
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.4 }}>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Monitor className="h-5 w-5 text-secondary" />Display Preferences</CardTitle>
-                <CardDescription>Customize how content is displayed</CardDescription>
+                <CardTitle className="flex items-center gap-2"><Monitor className="h-5 w-5 text-secondary" />{t('settings.display.title')}</CardTitle>
+                <CardDescription>{t('settings.display.description')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">Animations</Label>
-                    <div className="text-sm text-muted-foreground">Enable smooth transitions and animations</div>
+                    <Label className="text-base">{t('settings.display.animations')}</Label>
+                    <div className="text-sm text-muted-foreground">{t('settings.display.animationsDesc')}</div>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch
+                    checked={animationsEnabled}
+                    onCheckedChange={setAnimationsEnabled}
+                  />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">Compact View</Label>
-                    <div className="text-sm text-muted-foreground">Show more content in less space</div>
+                    <Label className="text-base">{t('settings.display.compactView')}</Label>
+                    <div className="text-sm text-muted-foreground">{t('settings.display.compactViewDesc')}</div>
                   </div>
-                  <Switch />
+                  <Switch
+                    checked={compactView}
+                    onCheckedChange={setCompactView}
+                  />
                 </div>
               </CardContent>
             </Card>

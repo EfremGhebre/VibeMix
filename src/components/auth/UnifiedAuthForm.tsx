@@ -12,14 +12,15 @@ import { signupSchema, loginSchema, type SignupFormData, type LoginFormData } fr
 
 interface UnifiedAuthFormProps {
   onSuccess: () => void;
+  defaultTab?: 'login' | 'signup';
 }
 
-export default function UnifiedAuthForm({ onSuccess }: UnifiedAuthFormProps) {
+export default function UnifiedAuthForm({ onSuccess, defaultTab = 'signup' }: UnifiedAuthFormProps) {
   const { signUp, signIn, resetPassword, loading } = useAuth();
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const { t } = useLanguage();
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(() => defaultTab === 'login');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   

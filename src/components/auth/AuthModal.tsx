@@ -8,11 +8,11 @@ interface AuthModalProps {
   defaultTab?: 'login' | 'signup';
 }
 
-export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, defaultTab = 'signup' }: AuthModalProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
-        <UnifiedAuthForm onSuccess={onClose} />
+        {isOpen ? <UnifiedAuthForm onSuccess={onClose} defaultTab={defaultTab} /> : null}
       </DialogContent>
     </Dialog>
   );

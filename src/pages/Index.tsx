@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Radio, Sparkles, Stars, ArrowRight, Globe, Smile, Music2, MessageCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface IndexProps {
   onOpenChat?: () => void;
@@ -11,9 +12,14 @@ interface IndexProps {
 const Index = ({ onOpenChat }: IndexProps) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleGetStarted = () => {
-    navigate('/discover');
+    if (user) {
+      navigate('/discover');
+    } else {
+      navigate({ pathname: '/', search: '?auth=login' });
+    }
   };
 
   return (

@@ -19,7 +19,7 @@ import { useLanguage, type Language } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
 import UserMenu from '@/components/auth/UserMenu';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -34,6 +34,7 @@ export default function Header() {
   const { t, currentLanguage, changeLanguage, isRTL } = useLanguage();
   const { user, loading, signOut, signingOut } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState<'login' | 'signup'>('login');
@@ -51,6 +52,17 @@ export default function Header() {
     };
     fetchProfile();
   }, [user]);
+
+  useEffect(() => {
+    if (searchParams.get('auth') !== 'login') return;
+    if (!user) {
+      setAuthModalTab('login');
+      setAuthModalOpen(true);
+    }
+    const next = new URLSearchParams(searchParams);
+    next.delete('auth');
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams, user]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
